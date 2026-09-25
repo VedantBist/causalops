@@ -54,9 +54,14 @@ def score(topology, telemetry):
         anomaly = float(latest.get("anomaly") or 0)
         descendants = list(nx.descendants(graph, service))
         affected = [node for node in descendants if float(by_service[node][-1].get("anomaly") or 0) >= THRESHOLD]
-        dependency = len(affected) / max(1, len(descendants))
-        temporal = _temporal(service, firsts, graph)
-        propagation = temporal * dependency if descendants else anomaly * temporal
+        if anomaly < THRESHOLD:
+            dependency = 0.
+            temporal = 0.
+            propagation = 0.
+        else:
+            dependency = len(affected) / max(1, len(descendants))
+            temporal = _temporal(service, firsts, graph)
+            propagation = temporal * dependency if descendants else anomaly * temporal
         latency, errors = float(latest.get("latency") or 0), float(latest.get("errorRate") or 0)
         correlation = min(1., .7 * anomaly + .2 * min(1., latency / 1000) + .1 * min(1., errors / 100))
         signals = {"anomaly": round(anomaly, 4), "temporalPrecedence": round(temporal, 4),

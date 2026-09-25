@@ -251,12 +251,14 @@ public class CausalOpsService {
             default -> throw new IllegalArgumentException("No live controller for target " + r.target());
         };
         try {
+            Object latencyVal = (r.parameters() != null && r.parameters().containsKey("latencyMs"))
+                    ? r.parameters().get("latencyMs") : 800;
             http.post()
                     .uri(url + "/internal/fault")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of(
                             "type", r.type(),
-                            "latencyMs", stop ? 0 : r.parameters().getOrDefault("latencyMs", 800),
+                            "latencyMs", stop ? 0 : latencyVal,
                             "failure", !stop && "SERVICE_FAILURE".equals(r.type())
                     ))
                     .retrieve()
@@ -288,11 +290,11 @@ public class CausalOpsService {
             }
             s.currentLatency = Math.round(latency);
             s.errorRate = Math.min(100, err);
-            s.status = latency > s.baselineLatency * 8 ? "critical"
-                    : latency > s.baselineLatency * 2 ? "degraded" : "healthy";
+            s.status = latency > s.baselineLatency * 8 || err > 25 ? "critical"
+                    : latency > s.baselineLatency * 2 || err > 5 ? "degraded" : "healthy";
             services.save(s);
 
-            double anomaly = Math.min(1, Math.max(0, (latency / s.baselineLatency - 1) / 4));
+            double anomaly = Math.min(1, Math.max(0, (latency / s.baselineLatency - 1) / 4 + (err > 1 ? err / 50.0 : 0)));
             db.update(
                     "insert into telemetry_snapshots(service_name,p50_latency,p95_latency,p99_latency," +
                     "error_rate,request_rate,db_latency,pool_utilization,anomaly_score) values(?,?,?,?,?,?,?,?,?)",
@@ -323,6 +325,11 @@ public class CausalOpsService {
 
     private int distance(String root, String target) {
         if (root.equals(target)) return 0;
+        if ("payment-service".equals(root)) {
+            if ("order-service".equals(target)) return 1;
+            if ("api-gateway".equals(target)) return 2;
+            return 20;
+        }
         List<String> path = List.of("inventory-db", "inventory-service", "order-service", "api-gateway");
         int a = path.indexOf(root), b = path.indexOf(target);
         return a >= 0 && b >= a ? b - a : 20;
@@ -333,7 +340,7 @@ public class CausalOpsService {
             Map<String, Object> m = json.readValue(String.valueOf(raw), new TypeReference<>() {});
             return ((Number) m.getOrDefault(key, fallback)).doubleValue();
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid fault parameters for " + key, e);
+            return fallback;
         }
     }
 
@@ -348,17 +355,28 @@ public class CausalOpsService {
                 .toList();
         if (hot.size() < 2) return;
 
+        String title = "Service Degradation Cascade";
+        var activeFaults = faults().stream().filter(f -> "ACTIVE".equals(f.get("status"))).toList();
+        if (!activeFaults.isEmpty()) {
+            String target = String.valueOf(activeFaults.get(0).get("target"));
+            String type = String.valueOf(activeFaults.get(0).get("type"));
+            if ("inventory-db".equals(target)) title = "Database Latency Cascade";
+            else if ("payment-service".equals(target)) title = "Payment Service Failure";
+            else if ("order-service".equals(target)) title = "Order Service Latency Cascade";
+            else title = target + " " + type.replace('_', ' ');
+        }
+
         UUID id = UUID.randomUUID();
         db.update(
                 "insert into incidents(id,incident_key,title,severity,status,summary,affected_services) " +
                 "values(?,?,?,?,'INVESTIGATING',?,cast(? as jsonb))",
                 id,
                 "INC-" + (8900 + new Random().nextInt(99)),
-                "Database Latency Cascade",
+                title,
                 "HIGH",
                 "Evidence threshold exceeded across dependent services",
                 write(hot.stream().map(s -> s.name).toList()));
-        events.emit("incident.created", id, Map.of("title", "Database Latency Cascade"));
+        events.emit("incident.created", id, Map.of("title", title));
         analyze(id);
     }
 
