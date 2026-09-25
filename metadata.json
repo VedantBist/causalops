@@ -1,0 +1,6 @@
+{
+  "name": "CausalOps - AI Root Cause Analysis & Failure Prediction",
+  "description": "AI-based root cause analysis, 3D causal topology, and failure prediction operations console for cloud microservices.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
