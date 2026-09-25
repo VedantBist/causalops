@@ -1,0 +1,28 @@
+{
+  "experiment_id": "V005",
+  "run_number": 1,
+  "started_at": "2026-09-25T18:49:40.298194+00:00",
+  "fault_start_at": "2026-09-25T18:49:45.334966+00:00",
+  "fault_end_at": "2026-09-25T18:50:11.350262+00:00",
+  "finished_at": "2026-09-25T18:50:19.361942+00:00",
+  "fault_type": "SERVICE_FAILURE",
+  "fault_target": "payment-service",
+  "fault_parameters": {},
+  "ground_truth_root_cause": "payment-service",
+  "expected_affected_services": [
+    "payment-service",
+    "order-service",
+    "api-gateway"
+  ],
+  "baseline_status": "Operational",
+  "incident_id": "bace4573-3b32-4d54-b4ec-5e5d6e41ebf0",
+  "detected_root_cause": "order-service",
+  "detected_confidence": 0.7061,
+  "rca_match": false,
+  "telemetry_start": "2026-09-25T18:49:40.305151+00:00",
+  "telemetry_end": "2026-09-25T18:50:19.361942+00:00",
+  "experiment_status": "SUCCESS",
+  "error_message": null,
+  "system_version": "v2-telemetry-upgrade",
+  "git_commit": "ef208ffa7dd8113dd17ca7f99d665d47033b11f0"
+}

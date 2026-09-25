@@ -1,0 +1,42 @@
+{
+  "candidates": [
+    {
+      "service": "order-service",
+      "score": 0.79,
+      "signals": "{\"anomaly\": 1.0, \"dependency\": 1.0, \"metricCorrelation\": 0.9001, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.5}"
+    },
+    {
+      "service": "api-gateway",
+      "score": 0.5833,
+      "signals": "{\"anomaly\": 1.0, \"dependency\": 0.0, \"metricCorrelation\": 0.8331, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.5}"
+    },
+    {
+      "service": "payment-service",
+      "score": 0.0013,
+      "signals": "{\"anomaly\": 0.0, \"dependency\": 0.0, \"metricCorrelation\": 0.0131, \"temporalPrecedence\": 0.0, \"propagationConsistency\": 0.0}"
+    },
+    {
+      "service": "inventory-service",
+      "score": 0.0011,
+      "signals": "{\"anomaly\": 0.0, \"dependency\": 0.0, \"metricCorrelation\": 0.0111, \"temporalPrecedence\": 0.0, \"propagationConsistency\": 0.0}"
+    },
+    {
+      "service": "inventory-db",
+      "score": 0.0003,
+      "signals": "{\"anomaly\": 0.0, \"dependency\": 0.0, \"metricCorrelation\": 0.0031, \"temporalPrecedence\": 0.0, \"propagationConsistency\": 0.0}"
+    }
+  ],
+  "analysis": {
+    "id": "5b562cb6-4179-483c-bbfd-81316a55d364",
+    "incident_id": "aa52c9d4-8700-462e-972b-b553ecb39728",
+    "completed_at": "2026-09-25T19:54:08.009+00:00",
+    "methodology": "HEURISTIC BASELINE: weighted anomaly, timestamp precedence, and dependency propagation",
+    "root_cause": "order-service",
+    "confidence": 0.91,
+    "evidence": {
+      "type": "jsonb",
+      "value": "[{\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"api-gateway\", \"baseline\": null, \"timestamp\": \"2026-09-25T19:54:07.966+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 665.0, \"classification\": \"OBSERVED\"}, {\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"order-service\", \"baseline\": null, \"timestamp\": \"2026-09-25T19:54:07.966+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 1080.0, \"classification\": \"OBSERVED\"}]",
+      "null": false
+    }
+  }
+}

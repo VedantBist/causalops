@@ -1,0 +1,14 @@
+{
+  "incidents": [
+    {
+      "id": "8df9ee95-7310-417a-ad4d-93ad88b8bb2f",
+      "incidentKey": "INC-8946",
+      "title": "Order Service Latency Cascade",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "openedAt": "2026-09-25T20:01:56.185+00:00",
+      "summary": "Evidence threshold exceeded across dependent services",
+      "affectedServices": "[\"api-gateway\", \"order-service\"]"
+    }
+  ]
+}

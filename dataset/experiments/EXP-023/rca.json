@@ -1,0 +1,42 @@
+{
+  "candidates": [
+    {
+      "service": "inventory-db",
+      "score": 0.7823,
+      "signals": "{\"anomaly\": 1.0, \"dependency\": 1.0, \"metricCorrelation\": 0.8231, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.5}"
+    },
+    {
+      "service": "inventory-service",
+      "score": 0.7785,
+      "signals": "{\"anomaly\": 1.0, \"dependency\": 1.0, \"metricCorrelation\": 0.7855, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.5}"
+    },
+    {
+      "service": "order-service",
+      "score": 0.6729,
+      "signals": "{\"anomaly\": 0.7208, \"dependency\": 1.0, \"metricCorrelation\": 0.5668, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.5}"
+    },
+    {
+      "service": "api-gateway",
+      "score": 0.4823,
+      "signals": "{\"anomaly\": 0.7944, \"dependency\": 0.0, \"metricCorrelation\": 0.5938, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.3972}"
+    },
+    {
+      "service": "payment-service",
+      "score": 0.0013,
+      "signals": "{\"anomaly\": 0.0, \"dependency\": 0.0, \"metricCorrelation\": 0.0131, \"temporalPrecedence\": 0.0, \"propagationConsistency\": 0.0}"
+    }
+  ],
+  "analysis": {
+    "id": "6d590f16-ad76-45c9-ac11-ef36d74a1ad6",
+    "incident_id": "c1c4fddc-3a0e-4857-b44e-4ccee4bb48a9",
+    "completed_at": "2026-09-25T19:36:25.646+00:00",
+    "methodology": "HEURISTIC BASELINE: weighted anomaly, timestamp precedence, and dependency propagation",
+    "root_cause": "inventory-db",
+    "confidence": 0.9023,
+    "evidence": {
+      "type": "jsonb",
+      "value": "[{\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"inventory-db\", \"baseline\": null, \"timestamp\": \"2026-09-25T19:36:25.613+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 615.0, \"classification\": \"OBSERVED\"}, {\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"inventory-service\", \"baseline\": null, \"timestamp\": \"2026-09-25T19:36:25.613+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 427.0, \"classification\": \"OBSERVED\"}, {\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"order-service\", \"baseline\": null, \"timestamp\": \"2026-09-25T19:36:25.613+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 310.64, \"classification\": \"OBSERVED\"}, {\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"api-gateway\", \"baseline\": null, \"timestamp\": \"2026-09-25T19:36:25.613+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 187.99679999999998, \"classification\": \"OBSERVED\"}]",
+      "null": false
+    }
+  }
+}

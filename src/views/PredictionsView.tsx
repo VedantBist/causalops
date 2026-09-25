@@ -2,24 +2,30 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { PREDICTIONS } from '../data/mockData';
 import { AppPage } from '../components/layout/AppShell';
 import { causalOpsApi, Prediction } from '../api/client';
+import { FailurePredictionItem } from '../types';
 
 interface PredictionsViewProps {
   onNavigate: (page: AppPage) => void;
 }
 
-function mapApiPrediction(p: Prediction) {
+function mapApiPrediction(p: Prediction): FailurePredictionItem {
   let factors: { name: string; value: number }[] = [];
   try { factors = JSON.parse(p.factors); } catch { factors = []; }
   const latencyRatio = factors.find(f => f.name === 'latency_ratio')?.value ?? 1;
+  const etaMinutes = Math.max(1, Math.round(p.horizonSeconds / 60));
+  const etaStr = `T+${etaMinutes}m (${p.horizonSeconds}s)`;
+  const stateStr = p.riskLevel === 'CRITICAL' ? 'Degraded / Saturation' : p.riskLevel === 'HIGH' ? 'Degraded' : 'Elevated Load';
   return {
     serviceId: p.service,
     serviceName: p.service,
+    tech: 'Spring Boot / Container',
+    currentState: 'Operational',
+    predictedState: stateStr,
     riskProbability: Math.round(p.probability * 100),
-    riskLevel: p.riskLevel as 'CRITICAL' | 'HIGH' | 'ELEVATED' | 'LOW',
-    horizonSeconds: p.horizonSeconds,
-    latencyRatio,
-    factors,
-    createdAt: p.createdAt,
+    riskCategory: (p.riskLevel as any) || 'ELEVATED',
+    eta: etaStr,
+    primaryCausalDriver: factors.length > 0 ? `${factors[0].name} (${factors[0].value.toFixed(2)})` : 'Anomaly Propagation',
+    driverDetail: p.factors || 'Propagated degradation score',
   };
 }
 

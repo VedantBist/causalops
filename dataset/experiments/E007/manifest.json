@@ -1,0 +1,30 @@
+{
+  "experiment_id": "E007",
+  "run_number": 1,
+  "started_at": "2026-09-25T18:27:21.313056+00:00",
+  "fault_start_at": "2026-09-25T18:27:26.346776+00:00",
+  "fault_end_at": "2026-09-25T18:27:42.361095+00:00",
+  "finished_at": "2026-09-25T18:27:50.379601+00:00",
+  "fault_type": "NETWORK_LATENCY",
+  "fault_target": "inventory-service",
+  "fault_parameters": {
+    "latencyMs": 800
+  },
+  "ground_truth_root_cause": "inventory-service",
+  "expected_affected_services": [
+    "inventory-service",
+    "order-service",
+    "api-gateway"
+  ],
+  "baseline_status": "Operational",
+  "incident_id": "66e61898-eee8-4d97-b706-a7b73ef32103",
+  "detected_root_cause": "order-service",
+  "detected_confidence": 0.99,
+  "rca_match": false,
+  "telemetry_start": "2026-09-25T18:27:21.319666+00:00",
+  "telemetry_end": "2026-09-25T18:27:50.379601+00:00",
+  "experiment_status": "SUCCESS",
+  "error_message": null,
+  "system_version": "v1-prototype",
+  "git_commit": "ef208ffa7dd8113dd17ca7f99d665d47033b11f0"
+}

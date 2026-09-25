@@ -1,0 +1,30 @@
+{
+  "experiment_id": "V008",
+  "run_number": 1,
+  "started_at": "2026-09-25T18:51:37.703172+00:00",
+  "fault_start_at": "2026-09-25T18:51:42.757759+00:00",
+  "fault_end_at": "2026-09-25T18:52:08.786175+00:00",
+  "finished_at": "2026-09-25T18:52:16.797472+00:00",
+  "fault_type": "NETWORK_LATENCY",
+  "fault_target": "inventory-service",
+  "fault_parameters": {
+    "latencyMs": 1100
+  },
+  "ground_truth_root_cause": "inventory-service",
+  "expected_affected_services": [
+    "inventory-service",
+    "order-service",
+    "api-gateway"
+  ],
+  "baseline_status": "Operational",
+  "incident_id": "e5ba96e3-3916-4037-9c00-f10171c64df2",
+  "detected_root_cause": "order-service",
+  "detected_confidence": 0.9052,
+  "rca_match": false,
+  "telemetry_start": "2026-09-25T18:51:37.709279+00:00",
+  "telemetry_end": "2026-09-25T18:52:16.797472+00:00",
+  "experiment_status": "SUCCESS",
+  "error_message": null,
+  "system_version": "v2-telemetry-upgrade",
+  "git_commit": "ef208ffa7dd8113dd17ca7f99d665d47033b11f0"
+}

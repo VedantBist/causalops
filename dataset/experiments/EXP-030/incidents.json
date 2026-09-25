@@ -1,0 +1,14 @@
+{
+  "incidents": [
+    {
+      "id": "4d94f682-b0e0-4ec5-8ee8-4f15104e5777",
+      "incidentKey": "INC-8950",
+      "title": "inventory-service NETWORK LATENCY",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "openedAt": "2026-09-25T19:41:01.596+00:00",
+      "summary": "Evidence threshold exceeded across dependent services",
+      "affectedServices": "[\"api-gateway\", \"inventory-service\", \"order-service\"]"
+    }
+  ]
+}

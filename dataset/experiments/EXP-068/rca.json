@@ -1,0 +1,42 @@
+{
+  "candidates": [
+    {
+      "service": "payment-service",
+      "score": 0.4145,
+      "signals": "{\"anomaly\": 0.402, \"dependency\": 0.5, \"metricCorrelation\": 0.3145, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.25}"
+    },
+    {
+      "service": "order-service",
+      "score": 0.2324,
+      "signals": "{\"anomaly\": 0.282, \"dependency\": 0.0, \"metricCorrelation\": 0.2275, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.0}"
+    },
+    {
+      "service": "api-gateway",
+      "score": 0.0751,
+      "signals": "{\"anomaly\": 0.198, \"dependency\": 0.0, \"metricCorrelation\": 0.1575, \"temporalPrecedence\": 0.0, \"propagationConsistency\": 0.0}"
+    },
+    {
+      "service": "inventory-service",
+      "score": 0.0011,
+      "signals": "{\"anomaly\": 0.0, \"dependency\": 0.0, \"metricCorrelation\": 0.0111, \"temporalPrecedence\": 0.0, \"propagationConsistency\": 0.0}"
+    },
+    {
+      "service": "inventory-db",
+      "score": 0.0003,
+      "signals": "{\"anomaly\": 0.0, \"dependency\": 0.0, \"metricCorrelation\": 0.0031, \"temporalPrecedence\": 0.0, \"propagationConsistency\": 0.0}"
+    }
+  ],
+  "analysis": {
+    "id": "de5c33cf-51c0-49d8-83bb-a6254b295cc3",
+    "incident_id": "7b9ea879-bc37-4b10-b469-40ea0d33e3df",
+    "completed_at": "2026-09-25T20:06:06.993+00:00",
+    "methodology": "HEURISTIC BASELINE: weighted anomaly, timestamp precedence, and dependency propagation",
+    "root_cause": "payment-service",
+    "confidence": 0.5345,
+    "evidence": {
+      "type": "jsonb",
+      "value": "[{\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"payment-service\", \"baseline\": null, \"timestamp\": \"2026-09-25T20:06:06.963+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 65.0, \"classification\": \"OBSERVED\"}, {\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"order-service\", \"baseline\": null, \"timestamp\": \"2026-09-25T20:06:06.963+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 80.0, \"classification\": \"OBSERVED\"}]",
+      "null": false
+    }
+  }
+}

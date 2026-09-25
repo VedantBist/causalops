@@ -1,0 +1,42 @@
+{
+  "candidates": [
+    {
+      "service": "inventory-db",
+      "score": 0.79,
+      "signals": "{\"anomaly\": 1.0, \"dependency\": 1.0, \"metricCorrelation\": 0.9001, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.5}"
+    },
+    {
+      "service": "inventory-service",
+      "score": 0.7897,
+      "signals": "{\"anomaly\": 1.0, \"dependency\": 1.0, \"metricCorrelation\": 0.8971, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.5}"
+    },
+    {
+      "service": "order-service",
+      "score": 0.7831,
+      "signals": "{\"anomaly\": 1.0, \"dependency\": 1.0, \"metricCorrelation\": 0.8314, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.5}"
+    },
+    {
+      "service": "api-gateway",
+      "score": 0.5781,
+      "signals": "{\"anomaly\": 1.0, \"dependency\": 0.0, \"metricCorrelation\": 0.7806, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.5}"
+    },
+    {
+      "service": "payment-service",
+      "score": 0.0013,
+      "signals": "{\"anomaly\": 0.0, \"dependency\": 0.0, \"metricCorrelation\": 0.0131, \"temporalPrecedence\": 0.0, \"propagationConsistency\": 0.0}"
+    }
+  ],
+  "analysis": {
+    "id": "628acf2c-9f0a-44b5-9a29-cc9dc6228173",
+    "incident_id": "1bc957ca-7de1-4c08-8e92-58bac40c6b86",
+    "completed_at": "2026-09-25T19:38:25.204+00:00",
+    "methodology": "HEURISTIC BASELINE: weighted anomaly, timestamp precedence, and dependency propagation",
+    "root_cause": "inventory-db",
+    "confidence": 0.91,
+    "evidence": {
+      "type": "jsonb",
+      "value": "[{\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"inventory-db\", \"baseline\": null, \"timestamp\": \"2026-09-25T19:38:25.186+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 1515.0, \"classification\": \"OBSERVED\"}, {\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"inventory-service\", \"baseline\": null, \"timestamp\": \"2026-09-25T19:38:25.186+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 985.0, \"classification\": \"OBSERVED\"}, {\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"order-service\", \"baseline\": null, \"timestamp\": \"2026-09-25T19:38:25.186+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 656.6, \"classification\": \"OBSERVED\"}, {\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"api-gateway\", \"baseline\": null, \"timestamp\": \"2026-09-25T19:38:25.186+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 402.49199999999996, \"classification\": \"OBSERVED\"}]",
+      "null": false
+    }
+  }
+}

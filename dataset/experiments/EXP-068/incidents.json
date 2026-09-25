@@ -1,0 +1,14 @@
+{
+  "incidents": [
+    {
+      "id": "7b9ea879-bc37-4b10-b469-40ea0d33e3df",
+      "incidentKey": "INC-8945",
+      "title": "Payment Service Failure",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "openedAt": "2026-09-25T20:06:06.975+00:00",
+      "summary": "Evidence threshold exceeded across dependent services",
+      "affectedServices": "[\"payment-service\", \"api-gateway\", \"order-service\"]"
+    }
+  ]
+}

@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
 import java.util.stream.*;
@@ -270,9 +271,12 @@ public class CausalOpsService {
 
     // ─── Scheduled telemetry collection ───────────────────────────────────────
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelayString = "${telemetry.collection-interval-ms:1000}")
     public void collect() {
         if (!demo) return;
+
+        Instant cycleInstant = Instant.now();
+        Timestamp cycleTimestamp = Timestamp.from(cycleInstant);
 
         var active = faults().stream().filter(f -> "ACTIVE".equals(f.get("status"))).toList();
 
@@ -296,9 +300,9 @@ public class CausalOpsService {
 
             double anomaly = Math.min(1, Math.max(0, (latency / s.baselineLatency - 1) / 4 + (err > 1 ? err / 50.0 : 0)));
             db.update(
-                    "insert into telemetry_snapshots(service_name,p50_latency,p95_latency,p99_latency," +
-                    "error_rate,request_rate,db_latency,pool_utilization,anomaly_score) values(?,?,?,?,?,?,?,?,?)",
-                    s.name, latency * .6, latency * .85, latency, err, 60,
+                    "insert into telemetry_snapshots(service_name,captured_at,p50_latency,p95_latency,p99_latency," +
+                    "error_rate,request_rate,db_latency,pool_utilization,anomaly_score) values(?,?,?,?,?,?,?,?,?,?)",
+                    s.name, cycleTimestamp, latency * .6, latency * .85, latency, err, 60,
                     s.name.equals("inventory-db") ? latency : null,
                     Math.min(100, 25 + anomaly * 70), anomaly);
         }

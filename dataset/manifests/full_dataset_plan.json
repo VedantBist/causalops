@@ -1,0 +1,927 @@
+{
+  "version": "v3-full-dataset-plan",
+  "planned_experiments": [
+    {
+      "experiment_id": "EXP-001",
+      "experiment_class": "CONTROL",
+      "fault_type": "NO_FAULT",
+      "target": "none",
+      "parameters": {},
+      "traffic_rate": "1 req/s",
+      "duration": 25,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-002",
+      "experiment_class": "CONTROL",
+      "fault_type": "NO_FAULT",
+      "target": "none",
+      "parameters": {},
+      "traffic_rate": "1 req/s",
+      "duration": 25,
+      "replicate_number": 2
+    },
+    {
+      "experiment_id": "EXP-003",
+      "experiment_class": "CONTROL",
+      "fault_type": "NO_FAULT",
+      "target": "none",
+      "parameters": {},
+      "traffic_rate": "1 req/s",
+      "duration": 25,
+      "replicate_number": 3
+    },
+    {
+      "experiment_id": "EXP-004",
+      "experiment_class": "CONTROL",
+      "fault_type": "NO_FAULT",
+      "target": "none",
+      "parameters": {},
+      "traffic_rate": "1 req/s",
+      "duration": 25,
+      "replicate_number": 4
+    },
+    {
+      "experiment_id": "EXP-005",
+      "experiment_class": "CONTROL",
+      "fault_type": "NO_FAULT",
+      "target": "none",
+      "parameters": {},
+      "traffic_rate": "5 req/s",
+      "duration": 25,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-006",
+      "experiment_class": "CONTROL",
+      "fault_type": "NO_FAULT",
+      "target": "none",
+      "parameters": {},
+      "traffic_rate": "5 req/s",
+      "duration": 25,
+      "replicate_number": 2
+    },
+    {
+      "experiment_id": "EXP-007",
+      "experiment_class": "CONTROL",
+      "fault_type": "NO_FAULT",
+      "target": "none",
+      "parameters": {},
+      "traffic_rate": "5 req/s",
+      "duration": 25,
+      "replicate_number": 3
+    },
+    {
+      "experiment_id": "EXP-008",
+      "experiment_class": "CONTROL",
+      "fault_type": "NO_FAULT",
+      "target": "none",
+      "parameters": {},
+      "traffic_rate": "15 req/s",
+      "duration": 25,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-009",
+      "experiment_class": "CONTROL",
+      "fault_type": "NO_FAULT",
+      "target": "none",
+      "parameters": {},
+      "traffic_rate": "15 req/s",
+      "duration": 25,
+      "replicate_number": 2
+    },
+    {
+      "experiment_id": "EXP-010",
+      "experiment_class": "CONTROL",
+      "fault_type": "NO_FAULT",
+      "target": "none",
+      "parameters": {},
+      "traffic_rate": "15 req/s",
+      "duration": 25,
+      "replicate_number": 3
+    },
+    {
+      "experiment_id": "EXP-011",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 200
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-012",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 400
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-013",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 600
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-014",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 800
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-015",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 1000
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-016",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 1200
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-017",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 1500
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-018",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 1800
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-019",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 2200
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-020",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 2500
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-021",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 600
+      },
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-022",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 1200
+      },
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-023",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 600
+      },
+      "traffic_rate": "15 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-024",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 1200
+      },
+      "traffic_rate": "15 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-025",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 1000
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 2
+    },
+    {
+      "experiment_id": "EXP-026",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 1500
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 2
+    },
+    {
+      "experiment_id": "EXP-027",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 1800
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 2
+    },
+    {
+      "experiment_id": "EXP-028",
+      "experiment_class": "FAULT",
+      "fault_type": "DB_LATENCY",
+      "target": "inventory-db",
+      "parameters": {
+        "latencyMs": 2500
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 2
+    },
+    {
+      "experiment_id": "EXP-029",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 200
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-030",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 400
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-031",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 600
+      },
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-032",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 800
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-033",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 1000
+      },
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-034",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 1500
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-035",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 2200
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-036",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 800
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 2
+    },
+    {
+      "experiment_id": "EXP-037",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 200
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-038",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 500
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-039",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 800
+      },
+      "traffic_rate": "15 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-040",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 1200
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-041",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 1800
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-042",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "inventory-service",
+      "parameters": {
+        "latencyMs": 2500
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-043",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_FAILURE",
+      "target": "inventory-service",
+      "parameters": {},
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-044",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_FAILURE",
+      "target": "inventory-service",
+      "parameters": {},
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-045",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_FAILURE",
+      "target": "inventory-service",
+      "parameters": {},
+      "traffic_rate": "15 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-046",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "order-service",
+      "parameters": {
+        "latencyMs": 200
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-047",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "order-service",
+      "parameters": {
+        "latencyMs": 400
+      },
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-048",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "order-service",
+      "parameters": {
+        "latencyMs": 600
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-049",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "order-service",
+      "parameters": {
+        "latencyMs": 850
+      },
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-050",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "order-service",
+      "parameters": {
+        "latencyMs": 1000
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-051",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "order-service",
+      "parameters": {
+        "latencyMs": 1200
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-052",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "order-service",
+      "parameters": {
+        "latencyMs": 1500
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-053",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "order-service",
+      "parameters": {
+        "latencyMs": 1800
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-054",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "order-service",
+      "parameters": {
+        "latencyMs": 850
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 2
+    },
+    {
+      "experiment_id": "EXP-055",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "order-service",
+      "parameters": {
+        "errorRate": 10
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-056",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "order-service",
+      "parameters": {
+        "errorRate": 20
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-057",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "order-service",
+      "parameters": {
+        "errorRate": 30
+      },
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-058",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "order-service",
+      "parameters": {
+        "errorRate": 40
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-059",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "order-service",
+      "parameters": {
+        "errorRate": 60
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-060",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "order-service",
+      "parameters": {
+        "errorRate": 80
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-061",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_FAILURE",
+      "target": "order-service",
+      "parameters": {},
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-062",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_FAILURE",
+      "target": "order-service",
+      "parameters": {},
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-063",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_FAILURE",
+      "target": "payment-service",
+      "parameters": {},
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-064",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_FAILURE",
+      "target": "payment-service",
+      "parameters": {},
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-065",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_FAILURE",
+      "target": "payment-service",
+      "parameters": {},
+      "traffic_rate": "15 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-066",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_FAILURE",
+      "target": "payment-service",
+      "parameters": {},
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 2
+    },
+    {
+      "experiment_id": "EXP-067",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "payment-service",
+      "parameters": {
+        "errorRate": 10
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-068",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "payment-service",
+      "parameters": {
+        "errorRate": 20
+      },
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-069",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "payment-service",
+      "parameters": {
+        "errorRate": 30
+      },
+      "traffic_rate": "15 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-070",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "payment-service",
+      "parameters": {
+        "errorRate": 40
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-071",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "payment-service",
+      "parameters": {
+        "errorRate": 50
+      },
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-072",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "payment-service",
+      "parameters": {
+        "errorRate": 60
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-073",
+      "experiment_class": "FAULT",
+      "fault_type": "ERROR_RATE",
+      "target": "payment-service",
+      "parameters": {
+        "errorRate": 80
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-074",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "payment-service",
+      "parameters": {
+        "latencyMs": 400
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-075",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "payment-service",
+      "parameters": {
+        "latencyMs": 800
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-076",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "payment-service",
+      "parameters": {
+        "latencyMs": 950
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-077",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "payment-service",
+      "parameters": {
+        "latencyMs": 1500
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-078",
+      "experiment_class": "FAULT",
+      "fault_type": "NETWORK_LATENCY",
+      "target": "payment-service",
+      "parameters": {
+        "latencyMs": 2200
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-079",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "payment-service",
+      "parameters": {
+        "latencyMs": 500
+      },
+      "traffic_rate": "1 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    },
+    {
+      "experiment_id": "EXP-080",
+      "experiment_class": "FAULT",
+      "fault_type": "SERVICE_LATENCY",
+      "target": "payment-service",
+      "parameters": {
+        "latencyMs": 1200
+      },
+      "traffic_rate": "5 req/s",
+      "duration": 26,
+      "replicate_number": 1
+    }
+  ]
+}

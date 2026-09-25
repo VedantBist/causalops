@@ -1,0 +1,42 @@
+{
+  "candidates": [
+    {
+      "service": "payment-service",
+      "score": 0.2021,
+      "signals": "{\"anomaly\": 0.202, \"dependency\": 0.0, \"metricCorrelation\": 0.1645, \"temporalPrecedence\": 0.5, \"propagationConsistency\": 0.0}"
+    },
+    {
+      "service": "order-service",
+      "score": 0.0548,
+      "signals": "{\"anomaly\": 0.142, \"dependency\": 0.0, \"metricCorrelation\": 0.1225, \"temporalPrecedence\": 0.0, \"propagationConsistency\": 0.0}"
+    },
+    {
+      "service": "api-gateway",
+      "score": 0.0384,
+      "signals": "{\"anomaly\": 0.1, \"dependency\": 0.0, \"metricCorrelation\": 0.084, \"temporalPrecedence\": 0.0, \"propagationConsistency\": 0.0}"
+    },
+    {
+      "service": "inventory-service",
+      "score": 0.0011,
+      "signals": "{\"anomaly\": 0.0, \"dependency\": 0.0, \"metricCorrelation\": 0.0111, \"temporalPrecedence\": 0.0, \"propagationConsistency\": 0.0}"
+    },
+    {
+      "service": "inventory-db",
+      "score": 0.0003,
+      "signals": "{\"anomaly\": 0.0, \"dependency\": 0.0, \"metricCorrelation\": 0.0031, \"temporalPrecedence\": 0.0, \"propagationConsistency\": 0.0}"
+    }
+  ],
+  "analysis": {
+    "id": "d1c220ca-71aa-49c5-9771-24037d542a7c",
+    "incident_id": "bf4350aa-870f-4df3-8dd7-c0012b2df38d",
+    "completed_at": "2026-09-25T20:05:22.229+00:00",
+    "methodology": "HEURISTIC BASELINE: weighted anomaly, timestamp precedence, and dependency propagation",
+    "root_cause": "payment-service",
+    "confidence": 0.3221,
+    "evidence": {
+      "type": "jsonb",
+      "value": "[{\"metric\": \"p99_latency\", \"source\": \"telemetry\", \"service\": \"payment-service\", \"baseline\": null, \"timestamp\": \"2026-09-25T20:05:22.194+00:00\", \"relationship\": \"observed anomalous telemetry\", \"observedValue\": 65.0, \"classification\": \"OBSERVED\"}]",
+      "null": false
+    }
+  }
+}

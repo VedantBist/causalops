@@ -1,0 +1,14 @@
+{
+  "incidents": [
+    {
+      "id": "2f8c7323-70d9-4f4d-8b71-688f0e3cbe4e",
+      "incidentKey": "INC-8907",
+      "title": "Database Latency Cascade",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "openedAt": "2026-09-25T19:34:28.979+00:00",
+      "summary": "Evidence threshold exceeded across dependent services",
+      "affectedServices": "[\"inventory-db\", \"inventory-service\", \"order-service\", \"api-gateway\"]"
+    }
+  ]
+}

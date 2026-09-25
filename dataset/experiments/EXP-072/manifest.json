@@ -1,0 +1,39 @@
+{
+  "experiment_id": "EXP-072",
+  "run_number": 1,
+  "started_at": "2026-09-25T20:08:17.925630+00:00",
+  "fault_start_at": "2026-09-25T20:08:22.946715+00:00",
+  "fault_end_at": "2026-09-25T20:08:48.962783+00:00",
+  "finished_at": "2026-09-25T20:08:56.980041+00:00",
+  "fault_type": "ERROR_RATE",
+  "fault_target": "payment-service",
+  "fault_parameters": {
+    "errorRate": 60
+  },
+  "ground_truth_root_cause": "payment-service",
+  "expected_affected_services": [
+    "payment-service",
+    "order-service",
+    "api-gateway"
+  ],
+  "baseline_status": "Operational",
+  "incident_id": "71fb513b-fe31-4ee0-8680-0865e9524939",
+  "detected_root_cause": "payment-service",
+  "detected_confidence": 0.8973,
+  "rca_match": true,
+  "telemetry_start": "2026-09-25T20:08:17.930062+00:00",
+  "telemetry_end": "2026-09-25T20:08:56.980041+00:00",
+  "traffic_rate_rps": 1,
+  "requests_started": 40,
+  "requests_completed": 40,
+  "requests_failed": 0,
+  "observed_start_rate": 1.02,
+  "observed_completion_rate": 1.02,
+  "max_concurrent_requests": 1,
+  "average_response_latency": 534.37,
+  "p95_response_latency": 820.34,
+  "experiment_status": "SUCCESS",
+  "error_message": null,
+  "system_version": "v2-telemetry-upgrade",
+  "git_commit": "ef208ffa7dd8113dd17ca7f99d665d47033b11f0"
+}

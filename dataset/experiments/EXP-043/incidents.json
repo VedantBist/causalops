@@ -1,0 +1,14 @@
+{
+  "incidents": [
+    {
+      "id": "a9272e8b-7d7d-4eba-887f-91a14dfd1245",
+      "incidentKey": "INC-8930",
+      "title": "inventory-service SERVICE FAILURE",
+      "severity": "HIGH",
+      "status": "RESOLVED",
+      "openedAt": "2026-09-25T19:49:31.029+00:00",
+      "summary": "Evidence threshold exceeded across dependent services",
+      "affectedServices": "[\"api-gateway\", \"inventory-service\", \"order-service\"]"
+    }
+  ]
+}

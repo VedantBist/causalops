@@ -1,0 +1,39 @@
+{
+  "experiment_id": "EXP-038",
+  "run_number": 1,
+  "started_at": "2026-09-25T19:46:06.960720+00:00",
+  "fault_start_at": "2026-09-25T19:46:11.990779+00:00",
+  "fault_end_at": "2026-09-25T19:46:37.998168+00:00",
+  "finished_at": "2026-09-25T19:46:46.007070+00:00",
+  "fault_type": "SERVICE_LATENCY",
+  "fault_target": "inventory-service",
+  "fault_parameters": {
+    "latencyMs": 500
+  },
+  "ground_truth_root_cause": "inventory-service",
+  "expected_affected_services": [
+    "inventory-service",
+    "order-service",
+    "api-gateway"
+  ],
+  "baseline_status": "Operational",
+  "incident_id": "735ae71d-ed6b-41e6-bd5e-9cdade4ad275",
+  "detected_root_cause": "inventory-service",
+  "detected_confidence": 0.9011,
+  "rca_match": true,
+  "telemetry_start": "2026-09-25T19:46:06.964765+00:00",
+  "telemetry_end": "2026-09-25T19:46:46.007070+00:00",
+  "traffic_rate_rps": 1,
+  "requests_started": 40,
+  "requests_completed": 40,
+  "requests_failed": 0,
+  "observed_start_rate": 1.02,
+  "observed_completion_rate": 1.02,
+  "max_concurrent_requests": 1,
+  "average_response_latency": 341.64,
+  "p95_response_latency": 522.66,
+  "experiment_status": "SUCCESS",
+  "error_message": null,
+  "system_version": "v2-telemetry-upgrade",
+  "git_commit": "ef208ffa7dd8113dd17ca7f99d665d47033b11f0"
+}

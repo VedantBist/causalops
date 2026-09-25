@@ -1,0 +1,28 @@
+{
+  "experiment_id": "E006",
+  "run_number": 1,
+  "started_at": "2026-09-25T18:26:52.154962+00:00",
+  "fault_start_at": "2026-09-25T18:26:57.194264+00:00",
+  "fault_end_at": "2026-09-25T18:27:13.220704+00:00",
+  "finished_at": "2026-09-25T18:27:21.240361+00:00",
+  "fault_type": "SERVICE_FAILURE",
+  "fault_target": "payment-service",
+  "fault_parameters": {},
+  "ground_truth_root_cause": "payment-service",
+  "expected_affected_services": [
+    "payment-service",
+    "order-service",
+    "api-gateway"
+  ],
+  "baseline_status": "Operational",
+  "incident_id": "e8563735-a6f5-4008-ba46-85c2ff93a9d6",
+  "detected_root_cause": "order-service",
+  "detected_confidence": 0.9061,
+  "rca_match": false,
+  "telemetry_start": "2026-09-25T18:26:52.161849+00:00",
+  "telemetry_end": "2026-09-25T18:27:21.240361+00:00",
+  "experiment_status": "SUCCESS",
+  "error_message": null,
+  "system_version": "v1-prototype",
+  "git_commit": "ef208ffa7dd8113dd17ca7f99d665d47033b11f0"
+}

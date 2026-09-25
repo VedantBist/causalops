@@ -1,0 +1,30 @@
+{
+  "experiment_id": "E008",
+  "run_number": 1,
+  "started_at": "2026-09-25T18:27:50.453370+00:00",
+  "fault_start_at": "2026-09-25T18:27:55.474008+00:00",
+  "fault_end_at": "2026-09-25T18:28:11.500072+00:00",
+  "finished_at": "2026-09-25T18:28:19.517969+00:00",
+  "fault_type": "NETWORK_LATENCY",
+  "fault_target": "payment-service",
+  "fault_parameters": {
+    "latencyMs": 950
+  },
+  "ground_truth_root_cause": "payment-service",
+  "expected_affected_services": [
+    "payment-service",
+    "order-service",
+    "api-gateway"
+  ],
+  "baseline_status": "Operational",
+  "incident_id": "45f0f1b4-2d5d-408d-b690-0e8828b0f843",
+  "detected_root_cause": "order-service",
+  "detected_confidence": 0.99,
+  "rca_match": false,
+  "telemetry_start": "2026-09-25T18:27:50.458747+00:00",
+  "telemetry_end": "2026-09-25T18:28:19.517969+00:00",
+  "experiment_status": "SUCCESS",
+  "error_message": null,
+  "system_version": "v1-prototype",
+  "git_commit": "ef208ffa7dd8113dd17ca7f99d665d47033b11f0"
+}

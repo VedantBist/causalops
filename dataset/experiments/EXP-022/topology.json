@@ -1,0 +1,94 @@
+{
+  "nodes": [
+    {
+      "id": "68161340-dd92-4866-917d-583395ac981b",
+      "name": "inventory-db",
+      "displayName": "inventory-db",
+      "type": "Database",
+      "status": "healthy",
+      "latencyP99": 15.0,
+      "baselineLatency": 15.0,
+      "errorRate": 0.1,
+      "throughput": "60 req/min",
+      "causalRole": "unaffected"
+    },
+    {
+      "id": "1febc4af-7a7e-40c4-bb6d-ed8702a3a5a0",
+      "name": "payment-service",
+      "displayName": "payment-service",
+      "type": "Microservice",
+      "status": "healthy",
+      "latencyP99": 65.0,
+      "baselineLatency": 65.0,
+      "errorRate": 0.1,
+      "throughput": "60 req/min",
+      "causalRole": "unaffected"
+    },
+    {
+      "id": "d0581ce3-73a8-4fed-8e67-82ce5f0afacb",
+      "name": "inventory-service",
+      "displayName": "inventory-service",
+      "type": "Microservice",
+      "status": "healthy",
+      "latencyP99": 55.0,
+      "baselineLatency": 55.0,
+      "errorRate": 0.1,
+      "throughput": "60 req/min",
+      "causalRole": "unaffected"
+    },
+    {
+      "id": "8c3c0387-695f-47b1-bcf0-27223d2ed434",
+      "name": "order-service",
+      "displayName": "order-service",
+      "type": "Microservice",
+      "status": "healthy",
+      "latencyP99": 80.0,
+      "baselineLatency": 80.0,
+      "errorRate": 0.1,
+      "throughput": "60 req/min",
+      "causalRole": "unaffected"
+    },
+    {
+      "id": "c8e6f485-3f8f-43eb-b687-37301a06a082",
+      "name": "api-gateway",
+      "displayName": "api-gateway",
+      "type": "Gateway",
+      "status": "healthy",
+      "latencyP99": 45.0,
+      "baselineLatency": 45.0,
+      "errorRate": 0.1,
+      "throughput": "60 req/min",
+      "causalRole": "unaffected"
+    }
+  ],
+  "edges": [
+    {
+      "id": "api-gateway-order-service",
+      "direction": "CALLS",
+      "target": "order-service",
+      "source": "api-gateway",
+      "type": "observed"
+    },
+    {
+      "id": "order-service-inventory-service",
+      "direction": "CALLS",
+      "target": "inventory-service",
+      "source": "order-service",
+      "type": "observed"
+    },
+    {
+      "id": "order-service-payment-service",
+      "direction": "CALLS",
+      "target": "payment-service",
+      "source": "order-service",
+      "type": "observed"
+    },
+    {
+      "id": "inventory-service-inventory-db",
+      "direction": "CALLS",
+      "target": "inventory-db",
+      "source": "inventory-service",
+      "type": "observed"
+    }
+  ]
+}
