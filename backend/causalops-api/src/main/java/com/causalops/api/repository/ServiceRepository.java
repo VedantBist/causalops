@@ -1,0 +1,1 @@
+package com.causalops.api.repository; import com.causalops.api.entity.ServiceEntity; import java.util.*; import org.springframework.data.jpa.repository.JpaRepository; public interface ServiceRepository extends JpaRepository<ServiceEntity,UUID>{ Optional<ServiceEntity> findByName(String name); }

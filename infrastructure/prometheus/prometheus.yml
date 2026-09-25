@@ -1,0 +1,5 @@
+global: { scrape_interval: 10s }
+scrape_configs:
+  - job_name: causalops
+    metrics_path: /actuator/prometheus
+    static_configs: [{ targets: ['causalops-api:8080','api-gateway:8080','order-service:8080','inventory-service:8080','payment-service:8080'] }]

@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-causalops}"
+      POSTGRES_USER: "${POSTGRES_USER:-causalops}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-causalops}"
+    ports: ["${POSTGRES_PORT:-5432}:5432"]
+    volumes: ["postgres-data:/var/lib/postgresql/data", "./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/01-business.sql"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"], interval: 5s, timeout: 3s, retries: 20 }
+  ai-engine:
+    build: ./ai-engine
+    ports: ["8000:8000"]
+    healthcheck: { test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"], interval: 10s, timeout: 3s, retries: 10 }
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.119.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes: ["./infrastructure/otel/otel-collector-config.yml:/etc/otelcol-contrib/config.yaml"]
+    ports: ["4317:4317", "4318:4318"]
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    command: ["--config.file=/etc/prometheus/prometheus.yml"]
+    volumes: ["./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"]
+    ports: ["9090:9090"]
+  loki:
+    image: grafana/loki:3.3.2
+    command: ["-config.file=/etc/loki/local-config.yaml"]
+    volumes: ["./infrastructure/loki/loki-config.yml:/etc/loki/local-config.yaml"]
+    ports: ["3100:3100"]
+  tempo:
+    image: grafana/tempo:2.6.1
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes: ["./infrastructure/tempo/tempo.yml:/etc/tempo.yaml"]
+    ports: ["3200:3200"]
+  causalops-api:
+    build: ./backend/causalops-api
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: "${POSTGRES_DB:-causalops}"
+      POSTGRES_USER: "${POSTGRES_USER:-causalops}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-causalops}"
+      AI_ENGINE_URL: http://ai-engine:8000
+      DEMO_MODE: "${DEMO_MODE:-true}"
+    ports: ["${CAUSALOPS_API_PORT:-8080}:8080"]
+    depends_on: { postgres: { condition: service_healthy }, ai-engine: { condition: service_healthy } }
+  inventory-service:
+    build: ./services/inventory-service
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/${POSTGRES_DB:-causalops}"
+      SPRING_DATASOURCE_USERNAME: "${POSTGRES_USER:-causalops}"
+      SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD:-causalops}"
+    depends_on: { postgres: { condition: service_healthy } }
+  payment-service: { build: ./services/payment-service }
+  order-service:
+    build: ./services/order-service
+    environment: { INVENTORY_URL: "http://inventory-service:8080", PAYMENT_URL: "http://payment-service:8080" }
+    depends_on: [inventory-service, payment-service]
+  api-gateway:
+    build: ./services/api-gateway
+    environment: { ORDER_URL: "http://order-service:8080" }
+    ports: ["8081:8080"]
+    depends_on: [order-service]
+volumes: { postgres-data: {} }

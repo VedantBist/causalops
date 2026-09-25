@@ -1,0 +1,19 @@
+server:
+  port: ${CAUSALOPS_API_PORT:8080}
+spring:
+  application.name: causalops-api
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:postgres}:${POSTGRES_PORT:5432}/${POSTGRES_DB:causalops}
+    username: ${POSTGRES_USER:causalops}
+    password: ${POSTGRES_PASSWORD:causalops}
+  jpa: { hibernate: { ddl-auto: validate }, open-in-view: false }
+  flyway: { enabled: true, baseline-on-migrate: true, baseline-version: 0 }
+management.endpoints.web.exposure.include: health,info,prometheus
+causalops:
+  ai-url: ${AI_ENGINE_URL:http://ai-engine:8000}
+  demo-mode: ${DEMO_MODE:true}
+  service-urls:
+    api-gateway: ${API_GATEWAY_URL:http://api-gateway:8081}
+    order-service: ${ORDER_SERVICE_URL:http://order-service:8082}
+    inventory-service: ${INVENTORY_SERVICE_URL:http://inventory-service:8083}
+    payment-service: ${PAYMENT_SERVICE_URL:http://payment-service:8084}

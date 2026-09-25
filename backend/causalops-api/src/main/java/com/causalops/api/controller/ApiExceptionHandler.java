@@ -1,0 +1,3 @@
+package com.causalops.api.controller;
+import org.springframework.http.*; import org.springframework.web.bind.annotation.*; import java.time.*; import java.util.*;
+@RestControllerAdvice public class ApiExceptionHandler { @ExceptionHandler({NoSuchElementException.class}) ResponseEntity<?> missing(Exception e){return error(HttpStatus.NOT_FOUND,e);} @ExceptionHandler({IllegalArgumentException.class}) ResponseEntity<?> bad(Exception e){return error(HttpStatus.BAD_REQUEST,e);} @ExceptionHandler(Exception.class) ResponseEntity<?> fail(Exception e){return error(HttpStatus.INTERNAL_SERVER_ERROR,e);} private ResponseEntity<?> error(HttpStatus s,Exception e){return ResponseEntity.status(s).body(Map.of("timestamp",Instant.now(),"status",s.value(),"message",e.getMessage()));}}
