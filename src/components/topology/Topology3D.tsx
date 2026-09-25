@@ -670,23 +670,28 @@ export const Topology3D: React.FC<Topology3DProps> = ({
         </div>
       </div>
 
-      {/* BOTTOM EPISTEMIC GRAMMAR LEGEND */}
-      <div className="absolute bottom-2.5 left-4 flex flex-wrap items-center gap-4 sm:gap-6 font-code text-[10px] text-[#7A8A92] select-none pointer-events-none bg-[#0D1113]/80 px-2 py-1 rounded">
+      {/* BOTTOM EPISTEMIC GRAMMAR LEGEND (5 SYSTEM KNOWLEDGE STATES) */}
+      <div className="absolute bottom-2.5 left-4 flex flex-wrap items-center gap-3 sm:gap-4 font-code text-[10px] select-none pointer-events-none bg-[#0D1113]/90 border border-[#1E2B38] px-2.5 py-1 rounded-[3px] text-[#A5B7C6]">
+        <span className="text-[#64798A] font-semibold uppercase text-[9px]">KNOWLEDGE STATES:</span>
         <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-[1.5px] bg-[#3B4D56]"></span>
-          <span>Observed Telemetry</span>
+          <span className="w-2 h-2 rounded-full bg-[#2F7D5C]"></span>
+          <span className="text-[#A5B7C6]">OBSERVED</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-[1.5px] border-b border-dashed border-[#B83A3A]"></span>
-          <span className="text-[#FFA4A4]">Active Incident Propagation</span>
+          <span className="w-2 h-2 rounded-full bg-[#D9822B]"></span>
+          <span className="text-[#F5BE6B]">CORRELATED</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-[1.5px] border-b border-dotted border-[#7565B0]"></span>
-          <span className="text-[#B9ADEE]">Predicted Impact</span>
+          <span className="w-2 h-2 rounded-full bg-[#B83A3A] animate-pulse"></span>
+          <span className="text-[#FFA4A4] font-semibold">INFERRED (Root Cause)</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-[1.5px] border-b border-dashed border-[#286B78]"></span>
-          <span className="text-[#55A5B5]">Simulated</span>
+          <span className="w-2 h-2 rounded-full bg-[#7C6FA8]"></span>
+          <span className="text-[#B9ADEE]">PREDICTED</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-[#286B78]"></span>
+          <span className="text-[#55A5B5]">SIMULATED</span>
         </div>
       </div>
     </div>

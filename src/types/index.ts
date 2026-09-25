@@ -94,6 +94,33 @@ export interface IncidentData {
   }[];
 }
 
+export type RootCauseStatus = 'Identified' | 'Investigating' | 'Unknown';
+export type KnowledgeState = 'OBSERVED' | 'CORRELATED' | 'INFERRED' | 'PREDICTED' | 'SIMULATED';
+
+export interface ActiveIncidentItem {
+  id: string;
+  title: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  status: 'Active' | 'Investigating' | 'Mitigating' | 'Monitoring';
+  rootCauseStatus: RootCauseStatus;
+  rootCauseCandidate?: string;
+  confidence?: number;
+  startTime: string;
+  duration: string;
+  affectedServices: string[];
+  summary: string;
+  impact: {
+    usersAffected: string;
+    requestsAffected: string;
+    revenueAtRisk: string;
+    slaStatus: string;
+  };
+  timelineSummary: {
+    time: string;
+    event: string;
+  }[];
+}
+
 export interface SimulationScenario {
   id: string;
   label: string;

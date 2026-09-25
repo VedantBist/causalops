@@ -6,6 +6,7 @@ import {
   LogEntry,
   TraceSpan,
   FailurePredictionItem,
+  ActiveIncidentItem,
 } from '../types';
 
 export const SYSTEM_META = {
@@ -424,6 +425,81 @@ export const TOPOLOGY_EDGES: TopologyEdge[] = [
     isIncidentPath: true,
     delayLabel: 'PREDICTED +12s',
     status: 'predicted',
+  },
+];
+
+export const ACTIVE_INCIDENTS: ActiveIncidentItem[] = [
+  {
+    id: 'INC-8941',
+    title: 'Database Latency Cascade',
+    severity: 'critical',
+    status: 'Active',
+    rootCauseStatus: 'Identified',
+    rootCauseCandidate: 'inventory-db',
+    confidence: 91.4,
+    startTime: '14:32:07 UTC',
+    duration: '07m 24s',
+    affectedServices: ['inventory-db', 'inventory-service', 'order-service', 'api-gateway'],
+    summary: 'Storage cluster disk I/O stall on inventory-db led to connection pool exhaustion, propagating cascading gRPC timeouts through inventory-service and order-service to trigger 504s on API Gateway.',
+    impact: {
+      usersAffected: '14,200',
+      requestsAffected: '48.2k',
+      revenueAtRisk: '$24,500/hr',
+      slaStatus: 'Breached (SLO 99.9%)',
+    },
+    timelineSummary: [
+      { time: '14:32:07', event: 'Origin: Disk I/O stall > 1,200ms on inventory-db' },
+      { time: '14:32:09', event: 'Connection pool exhausted in inventory-service (98/100)' },
+      { time: '14:32:12', event: 'gRPC deadline exceeded in order-service (820ms)' },
+      { time: '14:32:14', event: '504 Gateway Timeouts on /v2/checkout (7.2% error rate)' },
+    ],
+  },
+  {
+    id: 'INC-8940',
+    title: 'Payment Processing Timeout',
+    severity: 'high',
+    status: 'Investigating',
+    rootCauseStatus: 'Investigating',
+    rootCauseCandidate: 'payment-service',
+    confidence: 45.2,
+    startTime: '14:18:30 UTC',
+    duration: '20m 52s',
+    affectedServices: ['payment-service', 'payment-db', 'order-service'],
+    summary: 'Intermittent TLS handshake latency with external acquiring gateway causing thread queue backup on payment-service worker pool.',
+    impact: {
+      usersAffected: '3,800',
+      requestsAffected: '9,400',
+      revenueAtRisk: '$8,100/hr',
+      slaStatus: 'At Risk (SLO 99.5%)',
+    },
+    timelineSummary: [
+      { time: '14:18:30', event: 'Upstream payment acquiring endpoint P99 spiked to 4.2s' },
+      { time: '14:21:10', event: 'Payment worker retry buffer reached 82% capacity' },
+      { time: '14:25:00', event: 'Order checkout saga rollback rate increased to 4.8%' },
+    ],
+  },
+  {
+    id: 'INC-8937',
+    title: 'API Gateway Error Rate Spike',
+    severity: 'medium',
+    status: 'Monitoring',
+    rootCauseStatus: 'Unknown',
+    confidence: 0,
+    startTime: '13:54:12 UTC',
+    duration: '45m 10s',
+    affectedServices: ['api-gateway', 'auth-gateway'],
+    summary: 'Intermittent 429 Too Many Requests and rate limit contention on mobile BFF edge routes following burst traffic from client update.',
+    impact: {
+      usersAffected: '1,250',
+      requestsAffected: '3,100',
+      revenueAtRisk: '$1,200/hr',
+      slaStatus: 'Nominal SLO',
+    },
+    timelineSummary: [
+      { time: '13:54:12', event: 'Token bucket replenishment latency increased on Envoy edge' },
+      { time: '14:02:00', event: 'Mobile app v4.8 rollout traffic reached 1.4x baseline' },
+      { time: '14:15:30', event: 'Rate limit ceiling auto-adjusted; errors decaying' },
+    ],
   },
 ];
 

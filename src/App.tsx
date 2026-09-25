@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { AppShell, AppPage } from './components/layout/AppShell';
 import { OverviewView } from './views/OverviewView';
 import { TopologyView } from './views/TopologyView';
-import { IncidentInvestigationView } from './views/IncidentInvestigationView';
+import { ActiveIncidentsView } from './views/ActiveIncidentsView';
+import { RootCauseView } from './views/RootCauseView';
 import { SimulationView } from './views/SimulationView';
 import { PredictionsView } from './views/PredictionsView';
 import { ServicesView } from './views/ServicesView';
@@ -23,8 +24,9 @@ export default function App() {
       case 'services':
         return <ServicesView onNavigate={setCurrentPage} />;
       case 'active-incidents':
+        return <ActiveIncidentsView onNavigate={setCurrentPage} />;
       case 'root-cause':
-        return <IncidentInvestigationView onNavigate={setCurrentPage} />;
+        return <RootCauseView onNavigate={setCurrentPage} />;
       case 'simulation':
         return <SimulationView onNavigate={setCurrentPage} />;
       case 'predictions':

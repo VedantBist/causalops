@@ -21,11 +21,11 @@ interface AppShellProps {
 
 const PAGE_TITLES: Record<AppPage, string> = {
   overview: 'Command Center',
-  topology: 'Topology',
+  topology: 'Service Topology',
   services: 'Services Fleet',
-  'active-incidents': 'Incident Investigation #INC-8941',
+  'active-incidents': 'Active Incidents',
   'incident-history': 'Incident History',
-  'root-cause': 'Incident Investigation #INC-8941',
+  'root-cause': 'Root Cause Analysis — INC-8941',
   predictions: 'Failure Predictions',
   simulation: 'Counterfactual Simulation',
   metrics: 'Observability Metrics',
@@ -99,14 +99,14 @@ export const AppShell: React.FC<AppShellProps> = ({ currentPage, onNavigate, chi
                 <button
                   onClick={() => onNavigate('active-incidents')}
                   className={`w-full flex items-center justify-between h-6 px-2 rounded-[3px] text-[12px] transition-colors text-left ${
-                    currentPage === 'active-incidents' || currentPage === 'root-cause'
+                    currentPage === 'active-incidents'
                       ? 'bg-[#E9EDE9] text-[#286B78] font-semibold border-l-2 border-[#286B78]'
                       : 'text-[#5E6561] hover:bg-[#EAECE8] hover:text-[#171A19]'
                   }`}
                 >
                   <span>Active</span>
                   <span className="h-3.5 min-w-[14px] px-1 bg-[#B83A3A] text-white font-code text-[9px] leading-[14px] text-center rounded-[2px] font-semibold">
-                    1
+                    3
                   </span>
                 </button>
                 <button

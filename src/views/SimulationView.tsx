@@ -30,15 +30,17 @@ export const SimulationView: React.FC<SimulationViewProps> = ({ onNavigate }) =>
           {/* Incident Identification & Telemetry Context */}
           <div className="flex flex-col gap-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] bg-[#B83A3A]/10 text-[#B83A3A] font-code text-[10px] font-semibold uppercase tracking-wider">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#B83A3A]"></span>
-                {CORE_INCIDENT.id} · CRITICAL CASCADE
+              <span className="font-code text-[11px] px-2 py-0.5 rounded-[2px] bg-[#EC4899]/10 text-[#EC4899] font-semibold border border-[#EC4899]/30 uppercase tracking-wider">
+                SIMULATE · COUNTERFACTUAL ENGINE
               </span>
-              <span className="text-[15px] font-semibold text-[#171A19] tracking-tight">Database Latency Cascade</span>
+              <h1 className="text-[15px] font-bold text-[#171A19] tracking-tight">Counterfactual Simulation</h1>
               <span className="font-code text-[10px] text-[#5E6561] font-medium px-1.5 py-0.5 bg-[#F1F2F0] rounded-[2px]">
-                POSTERIOR CONF: 91.4%
+                TARGET: INC-8941 (inventory-db)
               </span>
             </div>
+            <p className="text-[11.5px] text-[#5E6561] mt-0.5">
+              Primary question: &ldquo;What happens if we intervene?&rdquo; · Compare baseline cascade against simulated state &amp; topology deltas
+            </p>
             <div className="flex items-center gap-x-3 gap-y-1 font-code text-[11px] text-[#5E6561] flex-wrap mt-0.5">
               <span className="flex items-center gap-1">
                 <span className="text-[#171A19] font-medium">Root Cause:</span>

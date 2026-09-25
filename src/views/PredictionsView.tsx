@@ -19,19 +19,19 @@ export const PredictionsView: React.FC<PredictionsViewProps> = ({ onNavigate }) 
   return (
     <div className="flex flex-col w-full font-sans text-[#171A19] p-4 bg-[#F7F7F5] select-text">
       {/* SUB-HEADER / CONTROLS */}
-      <div className="bg-[#F1F2F0] px-4 py-2 rounded-[3px] mb-3 border border-[#D9DCD8] flex flex-wrap items-center justify-between gap-y-2">
+      <div className="bg-[#FFFFFF] px-4 py-2.5 rounded-[3px] mb-3 border border-[#D9DCD8] flex flex-wrap items-center justify-between gap-y-2 shadow-xs">
         <div className="flex flex-col">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-[14px] font-bold uppercase tracking-tight text-[#171A19]">FAILURE RISK HORIZON</h1>
-            <span className="font-code text-[10px] px-1.5 py-0.5 rounded-[2px] bg-white border border-[#D9DCD8] text-[#00535f] font-semibold tracking-wider">
-              PREDICTIVE DAG
+            <span className="font-code text-[11px] px-2 py-0.5 rounded-[2px] bg-[#3B82F6]/10 text-[#3B82F6] font-semibold border border-[#3B82F6]/30 uppercase tracking-wider">
+              PREDICT · FAILURE RISK HORIZON
             </span>
-            <span className="font-code text-[10px] px-1.5 py-0.5 rounded-[2px] bg-[#B83A3A]/10 text-[#B83A3A] font-medium border border-[#B83A3A]/20">
-              ROOT: INC-8941 (inventory-db)
+            <h1 className="text-[15px] font-bold tracking-tight text-[#171A19]">Failure Predictions</h1>
+            <span className="font-code text-[10.5px] px-1.5 py-0.5 rounded-[2px] bg-[#B83A3A]/10 text-[#B83A3A] font-medium border border-[#B83A3A]/20">
+              ORIGIN: INC-8941 (inventory-db)
             </span>
           </div>
-          <p className="text-[12px] text-[#5E6561] mt-0.5">
-            Continuous causal failure projection across 47 active monitored topologies · Dynamic DAG propagation
+          <p className="text-[11.5px] text-[#5E6561] mt-0.5">
+            Primary question: &ldquo;What is likely to fail next?&rdquo; · Projected service degradation, probability, and time horizons
           </p>
         </div>
 
