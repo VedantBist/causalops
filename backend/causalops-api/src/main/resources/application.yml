@@ -13,7 +13,7 @@ causalops:
   ai-url: ${AI_ENGINE_URL:http://ai-engine:8000}
   demo-mode: ${DEMO_MODE:true}
   service-urls:
-    api-gateway: ${API_GATEWAY_URL:http://api-gateway:8081}
-    order-service: ${ORDER_SERVICE_URL:http://order-service:8082}
-    inventory-service: ${INVENTORY_SERVICE_URL:http://inventory-service:8083}
-    payment-service: ${PAYMENT_SERVICE_URL:http://payment-service:8084}
+    api-gateway: ${API_GATEWAY_URL:http://api-gateway:8080}
+    order-service: ${ORDER_SERVICE_URL:http://order-service:8080}
+    inventory-service: ${INVENTORY_SERVICE_URL:http://inventory-service:8080}
+    payment-service: ${PAYMENT_SERVICE_URL:http://payment-service:8080}

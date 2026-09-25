@@ -6,3 +6,8 @@ coverage/
 *.log
 .env*
 !.env.example
+target/
+**/target/
+__pycache__/
+*.pyc
+.pytest_cache/

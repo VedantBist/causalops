@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SIMULATION_SCENARIOS, CORE_INCIDENT } from '../data/mockData';
 import { AppPage } from '../components/layout/AppShell';
+import { causalOpsApi, SimulationResult } from '../api/client';
 
 interface SimulationViewProps {
   onNavigate: (page: AppPage) => void;
@@ -11,16 +12,30 @@ export const SimulationView: React.FC<SimulationViewProps> = ({ onNavigate }) =>
   const [currentTimeSec, setCurrentTimeSec] = useState<number>(180);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
+  const [liveResult, setLiveResult] = useState<SimulationResult | null>(null);
+  const [simulationError, setSimulationError] = useState<string | null>(null);
 
   const activeScenario =
     SIMULATION_SCENARIOS.find((s) => s.id === selectedScenarioId) || SIMULATION_SCENARIOS[0];
 
-  const handleRunSimulation = () => {
+  const handleRunSimulation = async () => {
     setIsSimulating(true);
-    setTimeout(() => {
+    setSimulationError(null);
+    try {
+      // Map scenario to API parameters
+      const reductionPercent = selectedScenarioId.includes('70') ? 70
+        : selectedScenarioId.includes('50') ? 50
+        : selectedScenarioId.includes('90') ? 90
+        : 70;
+      const result = await causalOpsApi.simulate({ target: 'inventory-db', reductionPercent });
+      setLiveResult(result);
+    } catch (err) {
+      setSimulationError('Simulation API unavailable — showing model estimates');
+    } finally {
       setIsSimulating(false);
-    }, 700);
+    }
   };
+
 
   return (
     <div className="flex flex-col w-full font-sans text-[#171A19] p-4 bg-[#F7F7F5] select-text">

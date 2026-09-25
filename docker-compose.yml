@@ -40,6 +40,10 @@ services:
       POSTGRES_USER: "${POSTGRES_USER:-causalops}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-causalops}"
       AI_ENGINE_URL: http://ai-engine:8000
+      API_GATEWAY_URL: http://api-gateway:8080
+      ORDER_SERVICE_URL: http://order-service:8080
+      INVENTORY_SERVICE_URL: http://inventory-service:8080
+      PAYMENT_SERVICE_URL: http://payment-service:8080
       DEMO_MODE: "${DEMO_MODE:-true}"
     ports: ["${CAUSALOPS_API_PORT:-8080}:8080"]
     depends_on: { postgres: { condition: service_healthy }, ai-engine: { condition: service_healthy } }

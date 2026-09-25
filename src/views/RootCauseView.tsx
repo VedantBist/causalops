@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CORE_INCIDENT } from '../data/mockData';
 import { AppPage } from '../components/layout/AppShell';
+import { causalOpsApi, ActiveIncident, RcaAnalysis } from '../api/client';
 
 interface RootCauseViewProps {
   onNavigate: (page: AppPage) => void;
@@ -9,6 +10,65 @@ interface RootCauseViewProps {
 export const RootCauseView: React.FC<RootCauseViewProps> = ({ onNavigate }) => {
   const [activeTab, setActiveTab] = useState<'hypotheses' | 'methodology' | 'telemetry'>('hypotheses');
   const [selectedChainNode, setSelectedChainNode] = useState<string>('inventory-db');
+  const [liveIncident, setLiveIncident] = useState<ActiveIncident | null>(null);
+  const [liveRca, setLiveRca] = useState<RcaAnalysis | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  const loadData = useCallback(async () => {
+    try {
+      const incidents = await causalOpsApi.incidents();
+      const latest = incidents.find(i => i.status === 'RCA_IDENTIFIED') ?? incidents[0] ?? null;
+      setLiveIncident(latest);
+      if (latest) {
+        try {
+          const rca = await causalOpsApi.incidentRca(latest.id);
+          setLiveRca(rca);
+          if (rca?.analysis?.root_cause) {
+            setSelectedChainNode(rca.analysis.root_cause);
+          }
+        } catch {
+          setLiveRca(null);
+        }
+      }
+      setApiError(null);
+    } catch {
+      setApiError('Backend unavailable — showing reference data');
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+    const interval = setInterval(loadData, 8000);
+    return () => clearInterval(interval);
+  }, [loadData]);
+
+  // Helper: parse string-encoded evidence from the DB
+  function parseEvidence(raw: unknown): any[] {
+    if (Array.isArray(raw)) return raw;
+    if (typeof raw === 'string') { try { return JSON.parse(raw); } catch { return []; } }
+    if (raw && typeof raw === 'object' && 'value' in (raw as any)) {
+      try { return JSON.parse((raw as any).value); } catch { return []; }
+    }
+    return [];
+  }
+
+  function parseCandidateSignals(raw: unknown): Record<string, number> {
+    if (typeof raw === 'string') { try { return JSON.parse(raw); } catch { return {}; } }
+    if (raw && typeof raw === 'object') return raw as Record<string, number>;
+    return {};
+  }
+
+  // Displayed data: prefer live, fall back to CORE_INCIDENT
+  const incidentKey = liveIncident?.incidentKey ?? CORE_INCIDENT.id;
+  const incidentTitle = liveIncident?.title ?? CORE_INCIDENT.title;
+  const incidentSeverity = liveIncident?.severity ?? 'CRITICAL';
+  const rootCause = liveRca?.analysis?.root_cause ?? 'inventory-db';
+  const confidence = liveRca?.analysis?.confidence ?? 0.914;
+  const methodology = liveRca?.analysis?.methodology ?? 'HEURISTIC BASELINE (mock)';
+  const candidates = liveRca?.candidates ?? [];
+  const evidence = parseEvidence(liveRca?.analysis?.evidence);
+
+
 
   return (
     <div className="flex flex-col w-full h-[calc(100vh-2.75rem)] overflow-hidden bg-[#F7F7F5] select-none font-sans text-[#171A19]">
@@ -20,12 +80,26 @@ export const RootCauseView: React.FC<RootCauseViewProps> = ({ onNavigate }) => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-code text-[11px] font-bold text-[#B83A3A] px-1.5 py-0.2 rounded-[2px] bg-[#B83A3A]/10 border border-[#B83A3A]/30">
-                CRITICAL
+              <span className={`font-code text-[11px] font-bold px-1.5 py-0.5 rounded-[2px] border ${
+                incidentSeverity === 'CRITICAL' ? 'text-[#B83A3A] bg-[#B83A3A]/10 border-[#B83A3A]/30'
+                : incidentSeverity === 'HIGH' ? 'text-[#C47F17] bg-[#D9822B]/10 border-[#D9822B]/30'
+                : 'text-[#5E6561] bg-[#F1F2F0] border-[#D9DCD8]'
+              }`}>
+                {incidentSeverity}
               </span>
               <h1 className="text-[15px] font-bold text-[#171A19] tracking-tight">
-                {CORE_INCIDENT.id} — {CORE_INCIDENT.title}
+                {incidentKey} — {incidentTitle}
               </h1>
+              {liveIncident && (
+                <span className="font-code text-[10px] px-1.5 py-0.5 rounded-[2px] bg-[#2F7D5C]/10 text-[#2F7D5C] border border-[#2F7D5C]/30">
+                  LIVE
+                </span>
+              )}
+              {apiError && (
+                <span className="font-code text-[10px] text-[#C47F17] px-1.5 py-0.5 bg-[#D9822B]/10 border border-[#D9822B]/30 rounded-[2px]">
+                  {apiError}
+                </span>
+              )}
             </div>
             <p className="text-[11px] text-[#5E6561]">
               Primary question: &ldquo;Why did this incident happen?&rdquo; · Inferred causal graph &amp; empirical attribution
@@ -69,8 +143,8 @@ export const RootCauseView: React.FC<RootCauseViewProps> = ({ onNavigate }) => {
               </div>
               <div className="flex items-baseline gap-1 font-code">
                 <span className="text-[10px] text-[#70797B] uppercase">Confidence:</span>
-                <span className="text-[18px] font-bold text-[#00535f]">91.4%</span>
-                <span className="text-[11px] text-[#858C87]">(Posterior Probability P=0.914)</span>
+                <span className="text-[18px] font-bold text-[#00535f]">{Math.round(confidence * 100)}%</span>
+                <span className="text-[11px] text-[#858C87]">(P={confidence.toFixed(3)})</span>
               </div>
             </div>
 
@@ -82,28 +156,33 @@ export const RootCauseView: React.FC<RootCauseViewProps> = ({ onNavigate }) => {
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-code text-[16px] font-bold text-[#171A19]">
-                      inventory-db
+                      {rootCause}
                     </span>
                     <span className="font-code text-[11px] text-[#5E6561] px-1.5 py-0.5 bg-white border border-[#D9DCD8] rounded-[2px]">
-                      PostgreSQL 15.4 · Primary (db.r6g.2xlarge)
+                      {rootCause.includes('db') ? 'PostgreSQL · Database' : 'Microservice'}
                     </span>
                     <span className="font-code text-[10px] font-bold text-[#B83A3A] uppercase px-1.5 py-0.5 bg-[#B83A3A]/10 rounded-[2px]">
                       Origin Node
                     </span>
                   </div>
                   <p className="text-[12.5px] text-[#2F443C] mt-1 leading-snug">
-                    Storage cluster disk I/O stall exceeded threshold (1,420ms) on relation{' '}
-                    <code className="font-code text-[11px] bg-white px-1 py-0.2 rounded border border-[#D9DCD8]">
-                      inventory_allocations
-                    </code>
-                    . Exclusive transaction lock contention exhausted client connection pool, cascading gRPC timeouts upstream.
+                    {liveRca
+                      ? `Causal analysis identified this service as the origin of the incident cascade. Anomaly score: ${Math.round(confidence * 100)}% confidence via heuristic baseline.`
+                      : `Storage cluster disk I/O stall exceeded threshold (1,420ms) on relation inventory_allocations. Exclusive transaction lock contention exhausted client connection pool, cascading gRPC timeouts upstream.`
+                    }
                   </p>
                 </div>
               </div>
               <div className="shrink-0 flex flex-col items-end pl-3 md:border-l border-[#D9DCD8]/80 font-code">
                 <span className="text-[10px] text-[#70797B] uppercase">T₀ Detected</span>
-                <span className="text-[13px] font-bold text-[#171A19]">14:32:07 UTC</span>
-                <span className="text-[10px] text-[#B83A3A] mt-0.5">Latency: 1.42s (+5800%)</span>
+                <span className="text-[13px] font-bold text-[#171A19]">
+                  {liveRca?.analysis?.completed_at
+                    ? new Date(liveRca.analysis.completed_at).toLocaleTimeString()
+                    : '14:32:07 UTC'}
+                </span>
+                <span className={`text-[10px] mt-0.5 ${liveRca ? 'text-[#00535f]' : 'text-[#B83A3A]'}`}>
+                  {liveRca ? `Confidence: ${Math.round(confidence * 100)}%` : 'Latency: 1.42s (+5800%)'}
+                </span>
               </div>
             </div>
           </div>

@@ -1,20 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PREDICTIONS } from '../data/mockData';
 import { AppPage } from '../components/layout/AppShell';
+import { causalOpsApi, Prediction } from '../api/client';
 
 interface PredictionsViewProps {
   onNavigate: (page: AppPage) => void;
+}
+
+function mapApiPrediction(p: Prediction) {
+  let factors: { name: string; value: number }[] = [];
+  try { factors = JSON.parse(p.factors); } catch { factors = []; }
+  const latencyRatio = factors.find(f => f.name === 'latency_ratio')?.value ?? 1;
+  return {
+    serviceId: p.service,
+    serviceName: p.service,
+    riskProbability: Math.round(p.probability * 100),
+    riskLevel: p.riskLevel as 'CRITICAL' | 'HIGH' | 'ELEVATED' | 'LOW',
+    horizonSeconds: p.horizonSeconds,
+    latencyRatio,
+    factors,
+    createdAt: p.createdAt,
+  };
 }
 
 export const PredictionsView: React.FC<PredictionsViewProps> = ({ onNavigate }) => {
   const [selectedServiceId, setSelectedServiceId] = useState<string>('inventory-service');
   const [horizon, setHorizon] = useState<'5m' | '15m' | '30m'>('15m');
   const [filterMode, setFilterMode] = useState<'all' | 'high_risk'>('all');
+  const [livePredictions, setLivePredictions] = useState<ReturnType<typeof mapApiPrediction>[]>([]);
+  const [apiError, setApiError] = useState<string | null>(null);
 
-  const selectedPrediction = PREDICTIONS.find((p) => p.serviceId === selectedServiceId) || PREDICTIONS[0];
+  const loadPredictions = useCallback(async () => {
+    try {
+      const data = await causalOpsApi.predictions();
+      // Deduplicate: keep latest per service
+      const byService = new Map<string, Prediction>();
+      for (const p of data) {
+        if (!byService.has(p.service) || new Date(p.createdAt) > new Date(byService.get(p.service)!.createdAt)) {
+          byService.set(p.service, p);
+        }
+      }
+      const mapped = Array.from(byService.values())
+        .map(mapApiPrediction)
+        .sort((a, b) => b.riskProbability - a.riskProbability);
+      setLivePredictions(mapped);
+      if (mapped.length > 0 && !mapped.find(p => p.serviceId === selectedServiceId)) {
+        setSelectedServiceId(mapped[0].serviceId);
+      }
+      setApiError(null);
+    } catch {
+      setApiError('Backend unavailable — showing last predictions');
+    }
+  }, [selectedServiceId]);
+
+  useEffect(() => {
+    loadPredictions();
+    const interval = setInterval(loadPredictions, 10000);
+    return () => clearInterval(interval);
+  }, [loadPredictions]);
+
+  // Prefer live data; fall back to mock
+  const allPredictions = livePredictions.length > 0 ? livePredictions : PREDICTIONS;
+  const selectedPrediction = allPredictions.find((p) => p.serviceId === selectedServiceId) || allPredictions[0];
   const displayedPredictions = filterMode === 'high_risk'
-    ? PREDICTIONS.filter((p) => p.riskProbability >= 60)
-    : PREDICTIONS;
+    ? allPredictions.filter((p) => p.riskProbability >= 60)
+    : allPredictions;
+
+  const _ = horizon; // used for display only
 
   return (
     <div className="flex flex-col w-full font-sans text-[#171A19] p-4 bg-[#F7F7F5] select-text">
@@ -26,9 +78,18 @@ export const PredictionsView: React.FC<PredictionsViewProps> = ({ onNavigate }) 
               PREDICT · FAILURE RISK HORIZON
             </span>
             <h1 className="text-[15px] font-bold tracking-tight text-[#171A19]">Failure Predictions</h1>
-            <span className="font-code text-[10.5px] px-1.5 py-0.5 rounded-[2px] bg-[#B83A3A]/10 text-[#B83A3A] font-medium border border-[#B83A3A]/20">
-              ORIGIN: INC-8941 (inventory-db)
+            <span className={`font-code text-[10.5px] px-1.5 py-0.5 rounded-[2px] font-medium border ${
+              livePredictions.length > 0
+                ? 'bg-[#2F7D5C]/10 text-[#2F7D5C] border-[#2F7D5C]/20'
+                : 'bg-[#D9822B]/10 text-[#C47F17] border-[#D9822B]/20'
+            }`}>
+              {livePredictions.length > 0 ? `LIVE · ${livePredictions.length} services` : 'MOCK DATA'}
             </span>
+            {apiError && (
+              <span className="font-code text-[10px] text-[#C47F17] bg-[#D9822B]/10 border border-[#D9822B]/30 px-2 py-0.5 rounded-[2px]">
+                {apiError}
+              </span>
+            )}
           </div>
           <p className="text-[11.5px] text-[#5E6561] mt-0.5">
             Primary question: &ldquo;What is likely to fail next?&rdquo; · Projected service degradation, probability, and time horizons
