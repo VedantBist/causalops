@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DemoStateProvider } from './context/DemoStateContext';
 import { AppShell, AppPage } from './components/layout/AppShell';
 import { OverviewView } from './views/OverviewView';
 import { TopologyView } from './views/TopologyView';
@@ -45,8 +46,10 @@ export default function App() {
   };
 
   return (
-    <AppShell currentPage={currentPage} onNavigate={setCurrentPage}>
-      {renderPage()}
-    </AppShell>
+    <DemoStateProvider>
+      <AppShell currentPage={currentPage} onNavigate={setCurrentPage}>
+        {renderPage()}
+      </AppShell>
+    </DemoStateProvider>
   );
 }

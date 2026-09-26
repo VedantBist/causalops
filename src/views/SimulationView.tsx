@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { SIMULATION_SCENARIOS, CORE_INCIDENT } from '../data/mockData';
 import { AppPage } from '../components/layout/AppShell';
 import { causalOpsApi, SimulationResult } from '../api/client';
+import { useDemoState } from '../context/DemoStateContext';
 
 interface SimulationViewProps {
   onNavigate: (page: AppPage) => void;
 }
 
 export const SimulationView: React.FC<SimulationViewProps> = ({ onNavigate }) => {
+  const { simulationScenarios, currentIncident } = useDemoState();
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('reduce-latency-70');
   const [currentTimeSec, setCurrentTimeSec] = useState<number>(180);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -15,19 +16,32 @@ export const SimulationView: React.FC<SimulationViewProps> = ({ onNavigate }) =>
   const [liveResult, setLiveResult] = useState<SimulationResult | null>(null);
   const [simulationError, setSimulationError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!simulationScenarios.some((s) => s.id === selectedScenarioId)) {
+      if (simulationScenarios[0]) {
+        setSelectedScenarioId(simulationScenarios[0].id);
+      }
+    }
+  }, [simulationScenarios, selectedScenarioId]);
+
   const activeScenario =
-    SIMULATION_SCENARIOS.find((s) => s.id === selectedScenarioId) || SIMULATION_SCENARIOS[0];
+    simulationScenarios.find((s) => s.id === selectedScenarioId) || simulationScenarios[0];
+
+  const rootTarget = currentIncident.rootCauseCandidate || 'inventory-db';
+  const isAuthFail = rootTarget.includes('auth-gateway');
 
   const handleRunSimulation = async () => {
     setIsSimulating(true);
     setSimulationError(null);
     try {
-      // Map scenario to API parameters
       const reductionPercent = selectedScenarioId.includes('70') ? 70
         : selectedScenarioId.includes('50') ? 50
         : selectedScenarioId.includes('90') ? 90
         : 70;
-      const result = await causalOpsApi.simulate({ target: 'inventory-db', reductionPercent });
+      const result = await causalOpsApi.simulate({
+        target: isAuthFail ? 'auth-gateway' : 'inventory-db',
+        reductionPercent,
+      });
       setLiveResult(result);
     } catch (err) {
       setSimulationError('Simulation API unavailable — showing model estimates');
@@ -50,7 +64,7 @@ export const SimulationView: React.FC<SimulationViewProps> = ({ onNavigate }) =>
               </span>
               <h1 className="text-[15px] font-bold text-[#171A19] tracking-tight">Counterfactual Simulation</h1>
               <span className="font-code text-[10px] text-[#5E6561] font-medium px-1.5 py-0.5 bg-[#F1F2F0] rounded-[2px]">
-                TARGET: INC-8941 (inventory-db)
+                TARGET: {currentIncident.id} ({rootTarget})
               </span>
             </div>
             <p className="text-[11.5px] text-[#5E6561] mt-0.5">
@@ -59,22 +73,22 @@ export const SimulationView: React.FC<SimulationViewProps> = ({ onNavigate }) =>
             <div className="flex items-center gap-x-3 gap-y-1 font-code text-[11px] text-[#5E6561] flex-wrap mt-0.5">
               <span className="flex items-center gap-1">
                 <span className="text-[#171A19] font-medium">Root Cause:</span>
-                <span className="text-[#00535f] font-medium">inventory-db.cluster-east</span>
+                <span className="text-[#00535f] font-medium">{rootTarget}</span>
               </span>
               <span className="text-[#D9DCD8]">/</span>
               <span className="flex items-center gap-1">
                 <span className="text-[#171A19] font-medium">Observed T0 Latency:</span>
-                <span className="text-[#B83A3A] font-semibold">1.42s</span>
+                <span className="text-[#B83A3A] font-semibold">{isAuthFail ? '1.45s' : '1.42s'}</span>
               </span>
               <span className="text-[#D9DCD8]">/</span>
               <span className="flex items-center gap-1">
-                <span className="text-[#171A19] font-medium">Pool Saturation:</span>
-                <span className="text-[#B83A3A] font-medium">198 / 200 (99%)</span>
+                <span className="text-[#171A19] font-medium">Contention:</span>
+                <span className="text-[#B83A3A] font-medium">{isAuthFail ? 'JWKS Cache Exhaustion' : '198 / 200 (99%)'}</span>
               </span>
               <span className="text-[#D9DCD8]">/</span>
               <span className="flex items-center gap-1">
                 <span className="text-[#171A19] font-medium">Blast Radius:</span>
-                <span>4 upstream tiers compromised</span>
+                <span>{currentIncident.blastRadius}</span>
               </span>
             </div>
           </div>
@@ -97,7 +111,7 @@ export const SimulationView: React.FC<SimulationViewProps> = ({ onNavigate }) =>
 
             {/* Quick Switch Selector Tabs */}
             <div className="hidden sm:flex items-center bg-[#F1F2F0] rounded-[2px] p-0.5 border border-[#D9DCD8]">
-              {SIMULATION_SCENARIOS.map((s) => (
+              {simulationScenarios.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => setSelectedScenarioId(s.id)}
@@ -648,7 +662,7 @@ export const SimulationView: React.FC<SimulationViewProps> = ({ onNavigate }) =>
             </div>
 
             <div className="flex flex-col gap-2 mt-1">
-              {SIMULATION_SCENARIOS.slice(1).map((s) => (
+              {simulationScenarios.slice(1).map((s) => (
                 <div
                   key={s.id}
                   onClick={() => setSelectedScenarioId(s.id)}

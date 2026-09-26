@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MOCK_LOGS } from '../data/mockData';
+import { useDemoState } from '../context/DemoStateContext';
 import { LogEntry } from '../types';
 import { AppPage } from '../components/layout/AppShell';
 
@@ -8,14 +8,21 @@ interface LogsViewProps {
 }
 
 export const LogsView: React.FC<LogsViewProps> = ({ onNavigate }) => {
-  const [selectedLogId, setSelectedLogId] = useState<string>('log-1');
-  const [searchQuery, setSearchQuery] = useState<string>('service:in(inventory-db, inventory-service, order-service, api-gateway) AND (level:ERROR OR level:WARN)');
+  const { activeFault, logs: demoLogs } = useDemoState();
+  const isAuthFail = activeFault === 'auth-gateway';
+  const defaultLogId = isAuthFail ? 'log-auth-1' : 'log-1';
+  const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>(
+    isAuthFail
+      ? 'service:in(auth-gateway, api-gateway, inventory-db, order-service) AND (level:ERROR OR level:WARN)'
+      : 'service:in(inventory-db, inventory-service, order-service, api-gateway) AND (level:ERROR OR level:WARN)'
+  );
   const [selectedLevel, setSelectedLevel] = useState<'ALL' | 'ERROR' | 'WARN' | 'INFO'>('ALL');
   const [copied, setCopied] = useState<boolean>(false);
 
-  const selectedLog = MOCK_LOGS.find((l) => l.id === selectedLogId) || MOCK_LOGS[0];
+  const selectedLog = demoLogs.find((l) => l.id === (selectedLogId ?? defaultLogId)) || demoLogs[0];
 
-  const filteredLogs = MOCK_LOGS.filter((l) => {
+  const filteredLogs = demoLogs.filter((l) => {
     if (selectedLevel !== 'ALL' && l.level !== selectedLevel) return false;
     return true;
   });
@@ -33,18 +40,18 @@ export const LogsView: React.FC<LogsViewProps> = ({ onNavigate }) => {
         <div className="flex flex-col xl:flex-row xl:items-center gap-y-1 gap-x-3 min-w-0">
           <div className="flex items-center gap-1.5 shrink-0">
             <span className="w-2 h-2 rounded-full bg-[#B83A3A] animate-pulse"></span>
-            <span className="font-code text-[11px] font-bold text-[#B83A3A]">INC-8941</span>
+            <span className="font-code text-[11px] font-bold text-[#B83A3A]">{isAuthFail ? 'INC-8945' : 'INC-8941'}</span>
             <span className="font-section text-[10.5px] uppercase text-[#171A19] font-bold tracking-wider">
-              Database Latency Cascade
+              {isAuthFail ? 'Auth Gateway Token Validation Failure' : 'Database Latency Cascade'}
             </span>
           </div>
           <div className="hidden xl:block h-3 w-px bg-[#D9DCD8]"></div>
           <div className="flex items-center gap-1 font-code text-[10.5px] text-[#5E6561] truncate">
             <span className="text-[#70797B]">Root Candidate:</span>
-            <span className="text-[#171A19] font-semibold">inventory-db (PostgreSQL 15.4)</span>
+            <span className="text-[#171A19] font-semibold">auth-gateway (Envoy Proxy 1.28)</span>
             <span className="text-[#70797B]">·</span>
             <span className="text-[#70797B]">Onset:</span>
-            <span className="text-[#00535f] font-medium">14:32:07.481 UTC (T0)</span>
+            <span className="text-[#00535f] font-medium">14:38:12.105 UTC (T0)</span>
           </div>
         </div>
         <div className="flex items-center gap-1.5 shrink-0 font-code text-[10px]">

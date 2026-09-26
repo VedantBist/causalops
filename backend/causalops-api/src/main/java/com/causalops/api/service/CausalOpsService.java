@@ -248,7 +248,7 @@ public class CausalOpsService {
             case "inventory-db", "inventory-service" -> inventoryUrl;
             case "order-service" -> orderUrl;
             case "payment-service" -> paymentUrl;
-            case "api-gateway" -> gatewayUrl;
+            case "api-gateway", "auth-gateway" -> gatewayUrl;
             default -> throw new IllegalArgumentException("No live controller for target " + r.target());
         };
         try {
@@ -329,6 +329,10 @@ public class CausalOpsService {
 
     private int distance(String root, String target) {
         if (root.equals(target)) return 0;
+        if ("auth-gateway".equals(root)) {
+            if ("api-gateway".equals(target)) return 1;
+            return 20;
+        }
         if ("payment-service".equals(root)) {
             if ("order-service".equals(target)) return 1;
             if ("api-gateway".equals(target)) return 2;
@@ -367,6 +371,7 @@ public class CausalOpsService {
             if ("inventory-db".equals(target)) title = "Database Latency Cascade";
             else if ("payment-service".equals(target)) title = "Payment Service Failure";
             else if ("order-service".equals(target)) title = "Order Service Latency Cascade";
+            else if ("auth-gateway".equals(target)) title = "Auth Gateway Token Validation Failure";
             else title = target + " " + type.replace('_', ' ');
         }
 

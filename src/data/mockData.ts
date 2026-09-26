@@ -24,60 +24,75 @@ export const SYSTEM_META = {
   slaThreat: 'High',
 };
 
-// 12 key architecture nodes that form the core topology and incident cascade
-export const SERVICES: ServiceNode[] = [
-  // TIER 1: Ingress
-  {
-    id: 'api-gateway',
-    name: 'api-gateway',
-    displayName: 'api-gateway',
-    tier: 'tier-01',
-    tierLabel: 'TIER-01 INGRESS',
-    type: 'Gateway',
-    tech: 'Envoy Proxy 1.28',
-    host: 'api-gw.ingress.us-east.internal',
-    region: 'us-east-1',
-    status: 'degraded',
-    latencyP99: 842,
-    baselineLatency: 132,
-    errorRate: 7.2,
-    throughput: '18.4k req/min',
-    podAllocation: { current: 12, max: 12 },
-    causalRole: 'downstream',
-    description: 'Edge HTTP reverse proxy and rate limiter routing external mobile and web clients.',
-    causalMechanism: '504 Gateway Timeouts caused by upstream transaction saturation in order-service',
-    propagationDelay: '+7.2s from T0',
-    upstreamDeps: ['order-service', 'auth-service', 'checkout-service'],
-    downstreamDeps: [],
-    pos3D: [-6, 2, 0],
-    pos2D: [70, 235],
-    isIncidentPath: true,
-    incidentStep: 4,
-    incidentStatusText: '504 Timeouts (7.2%)',
-  },
-  {
-    id: 'auth-gateway',
-    name: 'auth-gateway',
-    displayName: 'auth-gateway',
-    tier: 'tier-01',
-    tierLabel: 'TIER-01 INGRESS',
-    type: 'Gateway',
-    tech: 'Envoy Proxy 1.28',
-    host: 'auth-gw.ingress.us-east.internal',
-    region: 'us-east-1',
-    status: 'healthy',
-    latencyP99: 45,
-    baselineLatency: 42,
-    errorRate: 0.01,
-    throughput: '4.8k req/min',
-    podAllocation: { current: 4, max: 8 },
-    causalRole: 'unaffected',
-    description: 'OAuth2/OIDC ingress endpoint handling token issuance and refresh challenges.',
-    upstreamDeps: ['auth-service'],
-    downstreamDeps: [],
-    pos3D: [-6, 5, -2],
-    pos2D: [70, 110],
-  },
+export const BASE_AUTH_GATEWAY: ServiceNode = {
+  id: 'auth-gateway',
+  name: 'auth-gateway',
+  displayName: 'auth-gateway',
+  tier: 'tier-01',
+  tierLabel: 'TIER-01 INGRESS',
+  type: 'Gateway',
+  tech: 'Envoy Proxy 1.28',
+  host: 'auth-gw.ingress.us-east.internal',
+  region: 'us-east-1',
+  status: 'healthy',
+  latencyP99: 45,
+  baselineLatency: 42,
+  errorRate: 0.01,
+  throughput: '4.8k req/min',
+  podAllocation: { current: 4, max: 8 },
+  causalRole: 'unaffected',
+  description: 'OAuth2/OIDC ingress endpoint handling token issuance and refresh challenges.',
+  upstreamDeps: ['auth-service'],
+  downstreamDeps: [],
+  pos3D: [-6, 5, -2],
+  pos2D: [70, 110],
+};
+
+export const CRITICAL_AUTH_GATEWAY: ServiceNode = {
+  ...BASE_AUTH_GATEWAY,
+  status: 'critical',
+  latencyP99: 1450,
+  errorRate: 18.5,
+  throughput: '1.2k req/min (Degraded)',
+  podAllocation: { current: 8, max: 8 },
+  causalRole: 'incident_root',
+  downstreamDeps: ['api-gateway'],
+  isIncidentPath: true,
+  incidentStep: 1,
+  incidentStatusText: '502 Bad Gateway / OAuth2 Token Validation Timeout (18.5%)',
+  causalMechanism: 'JWKS token validation pool exhaustion & TLS handshake stall propagating auth rejections to API ingress.',
+};
+
+const COMMON_INGRESS_API_GATEWAY: ServiceNode = {
+  id: 'api-gateway',
+  name: 'api-gateway',
+  displayName: 'api-gateway',
+  tier: 'tier-01',
+  tierLabel: 'TIER-01 INGRESS',
+  type: 'Gateway',
+  tech: 'Envoy Proxy 1.28',
+  host: 'api-gw.ingress.us-east.internal',
+  region: 'us-east-1',
+  status: 'degraded',
+  latencyP99: 842,
+  baselineLatency: 132,
+  errorRate: 7.2,
+  throughput: '18.4k req/min',
+  podAllocation: { current: 12, max: 12 },
+  causalRole: 'downstream',
+  description: 'Edge HTTP reverse proxy and rate limiter routing external mobile and web clients.',
+  causalMechanism: '504 Gateway Timeouts caused by upstream transaction saturation in order-service',
+  propagationDelay: '+7.2s from T0',
+  upstreamDeps: ['order-service', 'auth-service', 'checkout-service'],
+  downstreamDeps: [],
+  pos3D: [-6, 2, 0],
+  pos2D: [70, 235],
+  isIncidentPath: true,
+  incidentStep: 4,
+  incidentStatusText: '504 Timeouts (7.2%)',
+};
+
+const REMAINING_SERVICES: ServiceNode[] = [
   {
     id: 'web-gateway',
     name: 'web-gateway',
@@ -375,7 +390,42 @@ export const SERVICES: ServiceNode[] = [
   },
 ];
 
-export const TOPOLOGY_EDGES: TopologyEdge[] = [
+export const BASE_SERVICES: ServiceNode[] = [
+  COMMON_INGRESS_API_GATEWAY,
+  BASE_AUTH_GATEWAY,
+  ...REMAINING_SERVICES,
+];
+
+export const AUTH_FAIL_SERVICES: ServiceNode[] = [
+  COMMON_INGRESS_API_GATEWAY,
+  CRITICAL_AUTH_GATEWAY,
+  ...REMAINING_SERVICES,
+];
+
+export let SERVICES: ServiceNode[] = [...BASE_SERVICES];
+
+export const AUTH_FAIL_EDGES: TopologyEdge[] = [
+  {
+    id: 'e-inc-auth-1',
+    source: 'auth-gateway',
+    target: 'auth-service',
+    type: 'observed',
+    isIncidentPath: true,
+    delayLabel: '+1.45s JWKS STALL',
+    status: 'critical',
+  },
+  {
+    id: 'e-inc-auth-2',
+    source: 'auth-gateway',
+    target: 'api-gateway',
+    type: 'inferred',
+    isIncidentPath: true,
+    delayLabel: '+1.8s 502 ERROR',
+    status: 'critical',
+  },
+];
+
+export const BASE_TOPOLOGY_EDGES: TopologyEdge[] = [
   // Nominal edges
   { id: 'e-gw-auth', source: 'api-gateway', target: 'auth-service', type: 'observed', status: 'nominal' },
   { id: 'e-auth-redis', source: 'auth-service', target: 'redis-cache', type: 'observed', status: 'nominal' },
@@ -385,7 +435,7 @@ export const TOPOLOGY_EDGES: TopologyEdge[] = [
   { id: 'e-pay-notify', source: 'payment-service', target: 'notification-svc', type: 'observed', status: 'nominal' },
   { id: 'e-notify-kafka', source: 'notification-svc', target: 'kafka-events', type: 'observed', status: 'nominal' },
 
-  // ACTIVE INCIDENT CAUSAL CHAIN EDGES
+  // ACTIVE INCIDENT CAUSAL CHAIN EDGES (INC-8941 DB cascade)
   // 1: inventory-db -> inventory-service
   {
     id: 'e-inc-1',
@@ -428,7 +478,40 @@ export const TOPOLOGY_EDGES: TopologyEdge[] = [
   },
 ];
 
-export const ACTIVE_INCIDENTS: ActiveIncidentItem[] = [
+export const AUTH_FAIL_TOPOLOGY_EDGES: TopologyEdge[] = [
+  ...AUTH_FAIL_EDGES,
+  ...BASE_TOPOLOGY_EDGES,
+];
+
+export let TOPOLOGY_EDGES: TopologyEdge[] = [...BASE_TOPOLOGY_EDGES];
+
+export const AUTH_INCIDENT_ITEM: ActiveIncidentItem = {
+  id: 'INC-8945',
+  title: 'Auth Gateway Token Validation & JWKS Timeout Failure',
+  severity: 'critical',
+  status: 'Active',
+  rootCauseStatus: 'Identified',
+  rootCauseCandidate: 'auth-gateway',
+  confidence: 94.8,
+  startTime: '14:38:12 UTC',
+  duration: '11m 45s',
+  affectedServices: ['auth-gateway', 'api-gateway', 'auth-service'],
+  summary: 'JWKS connection pool exhaustion and cryptographic signature validation timeouts in auth-gateway causing cascading 502/504 Bad Gateway responses across authenticated API routes.',
+  impact: {
+    usersAffected: '18,400',
+    requestsAffected: '62.5k',
+    revenueAtRisk: '$31,000/hr',
+    slaStatus: 'Breached (SLO 99.9%)',
+  },
+  timelineSummary: [
+    { time: '14:38:12', event: 'OIDC token validation pool saturated on auth-gateway' },
+    { time: '14:39:05', event: 'P99 latency spiked from 42ms to 1,450ms' },
+    { time: '14:41:20', event: 'Downstream api-gateway shedding 18.5% of ingress requests with 502/504' },
+    { time: '14:45:00', event: 'Causal engine flagged auth-gateway as root cause with 94.8% confidence' },
+  ],
+};
+
+export const BASE_ACTIVE_INCIDENTS: ActiveIncidentItem[] = [
   {
     id: 'INC-8941',
     title: 'Database Latency Cascade',
@@ -502,6 +585,145 @@ export const ACTIVE_INCIDENTS: ActiveIncidentItem[] = [
     ],
   },
 ];
+
+export const AUTH_FAIL_ACTIVE_INCIDENTS: ActiveIncidentItem[] = [
+  AUTH_INCIDENT_ITEM,
+  ...BASE_ACTIVE_INCIDENTS,
+];
+
+export let ACTIVE_INCIDENTS: ActiveIncidentItem[] = [...BASE_ACTIVE_INCIDENTS];
+
+export const AUTH_INCIDENT: IncidentData = {
+  id: 'INC-8945',
+  title: 'Auth Gateway Token Validation & JWKS Timeout Failure',
+  severity: 'CRITICAL',
+  status: 'ACTIVE',
+  rootCauseCandidate: 'auth-gateway',
+  modelConfidence: 94,
+  posteriorProb: 0.948,
+  detectedAt: '14:38:12 UTC',
+  blastRadius: 'Tier-1 Ingress degraded (3 services)',
+  elapsedTime: '11m 45s',
+  engineState: 'Triage Active',
+  slaExposure: 'High · Tier 0',
+  dagPropagation: 'CONFIRMED',
+  summary: 'OIDC token validation pool exhaustion and JWKS handshake timeouts on auth-gateway propagating 502/504 Bad Gateway rejections to api-gateway and checkout services.',
+  recommendedIntervention: 'Flush JWKS cache, failover auth-gateway to secondary OIDC endpoint, and scale ingress pods from 4 to 8.',
+  targetAddress: 'auth-gw.ingress.us-east.internal:443',
+  steps: [
+    {
+      step: 1,
+      serviceId: 'auth-gateway',
+      serviceName: 'auth-gateway (Origin)',
+      timestamp: '14:38:12.105',
+      offsetSeconds: 'T₀ 14:38:12',
+      summary: 'OIDC token validation pool saturated (100/100 leases)',
+      detail: 'JWKS keystore endpoint TLS handshake stall. P99 latency spiked from 42ms to 1,450ms; 18.5% error rate.',
+      metricLabel: 'Latency (P99)',
+      metricValue: '1.45s',
+      status: 'critical',
+      causalType: 'OBSERVED TELEMETRY',
+    },
+    {
+      step: 2,
+      serviceId: 'auth-service',
+      serviceName: 'auth-service',
+      timestamp: '14:38:13.820',
+      offsetSeconds: '+1.7s',
+      summary: 'JWT verify queue backlog & token retry buffer full',
+      detail: 'Backpressure from auth-gateway caused Tokio worker queue saturation. P99 latency increased to 480ms.',
+      metricLabel: 'Queue Depth',
+      metricValue: '480 / 500',
+      status: 'degraded',
+      causalType: 'OBSERVED TELEMETRY',
+    },
+    {
+      step: 3,
+      serviceId: 'api-gateway',
+      serviceName: 'api-gateway',
+      timestamp: '14:38:15.420',
+      offsetSeconds: '+3.3s',
+      summary: '502 Bad Gateway on authenticated ingress routes',
+      detail: 'Envoy ingress shedding unauthenticated requests as auth-gateway timed out. Error rate jumped to 14.2%.',
+      metricLabel: 'Error Rate',
+      metricValue: '14.2%',
+      status: 'critical',
+      causalType: 'OBSERVED TELEMETRY',
+    },
+    {
+      step: 4,
+      serviceId: 'checkout-service',
+      serviceName: 'checkout-service',
+      timestamp: '14:38:18.050',
+      offsetSeconds: '+5.9s',
+      summary: 'Customer checkout authorization dropouts',
+      detail: 'Client bearer tokens failing authorization check; checkout conversions dropped by 64%.',
+      metricLabel: 'Auth Drops',
+      metricValue: '64.1%',
+      status: 'degraded',
+      causalType: 'OBSERVED TELEMETRY',
+    },
+  ],
+  fiveCriteria: [
+    {
+      number: '01',
+      name: 'EARLIEST ANOMALY',
+      source: 'envoy_cluster_upstream_rq_time',
+      description: 'auth-gateway showed the earliest anomaly (+1,408ms surge on /oauth/token at 14:38:12.105).',
+      verified: true,
+    },
+    {
+      number: '02',
+      name: 'DEPENDENCY RELATIONSHIP',
+      source: 'Mesh Topology',
+      description: 'api-gateway directly delegates Bearer JWT verification to auth-gateway ingress before routing.',
+      verified: true,
+    },
+    {
+      number: '03',
+      name: 'TEMPORAL PRECEDENCE',
+      source: 'Distributed Tracing',
+      description: 'Errors appeared first on auth-gateway (T0), followed by auth-service (+1.7s) and api-gateway (+3.3s).',
+      verified: true,
+    },
+    {
+      number: '04',
+      name: 'PROPAGATION CONSISTENCY',
+      source: 'Causal Graph DAG',
+      description: 'No anomalies observed on unaffected DB branches; error cascade strictly matches the auth DAG.',
+      verified: true,
+    },
+    {
+      number: '05',
+      name: 'COUNTERFACTUAL ROBUSTNESS',
+      source: 'Structural Causal Model',
+      description: 'Simulating do(auth-gateway.latency = 42ms) restores api-gateway success rate to 99.8%.',
+      verified: true,
+    },
+  ],
+  competingHypotheses: [
+    {
+      serviceId: 'auth-gateway',
+      confidence: 95,
+      description: 'Earliest anomaly onset (14:38:12), upstream OIDC JWKS connection exhaustion, and full causal path propagation match.',
+    },
+    {
+      serviceId: 'auth-service',
+      confidence: 34,
+      description: 'Latency spike began 1.7s AFTER auth-gateway JWKS stall; queue backlog is reactive backpressure.',
+    },
+    {
+      serviceId: 'api-gateway',
+      confidence: 18,
+      description: '502/504 errors on api-gateway are downstream consequences of auth-gateway timeout, not origin.',
+    },
+    {
+      serviceId: 'checkout-service',
+      confidence: 8,
+      description: 'Customer checkout authorization dropouts are a terminal symptom of unauthenticated ingress rejections.',
+    },
+  ],
+};
 
 export const CORE_INCIDENT: IncidentData = {
   id: 'INC-8941',
@@ -635,7 +857,21 @@ export const CORE_INCIDENT: IncidentData = {
   ],
 };
 
-export const SIMULATION_SCENARIOS: SimulationScenario[] = [
+export const AUTH_SIMULATION_SCENARIO: SimulationScenario = {
+  id: 'flush-jwks-scale-auth',
+  label: 'Flush JWKS & Scale Auth',
+  description: 'Flush OIDC JWKS token cache and autoscale auth-gateway from 4 to 8 pods',
+  modeledComponent: 'auth-gateway',
+  horizonSeconds: 300,
+  predictedPeakImpact: { from: 95, to: 14, delta: '-81 pp' },
+  servicesRecovered: '3 / 3 Complete',
+  recoveryPercentageAt180: 98,
+  predictedP99Latency: { from: 1450, to: 44, delta: 'Δ -97.0%' },
+  predicted504ErrorRate: { from: 18.5, to: 0.1, delta: 'Δ -99.4%' },
+  riskLabel: 'Low (Instant Token Recovery)',
+};
+
+export const BASE_SIMULATION_SCENARIOS: SimulationScenario[] = [
   {
     id: 'reduce-latency-70',
     label: '-70% Latency',
@@ -690,7 +926,27 @@ export const SIMULATION_SCENARIOS: SimulationScenario[] = [
   },
 ];
 
-export const PREDICTIONS: FailurePredictionItem[] = [
+export const AUTH_FAIL_SIMULATION_SCENARIOS: SimulationScenario[] = [
+  AUTH_SIMULATION_SCENARIO,
+  ...BASE_SIMULATION_SCENARIOS,
+];
+
+export let SIMULATION_SCENARIOS: SimulationScenario[] = [...BASE_SIMULATION_SCENARIOS];
+
+export const AUTH_PREDICTION_ITEM: FailurePredictionItem = {
+  serviceId: 'auth-gateway',
+  serviceName: 'auth-gateway',
+  tech: 'Envoy 1.28 · ingress-auth (8 Pods)',
+  currentState: 'Critical (1,450ms P99)',
+  predictedState: 'Imminent Ingress Total Rejection (502 Storm)',
+  riskProbability: 95,
+  riskCategory: 'CRITICAL',
+  eta: '+45s',
+  primaryCausalDriver: 'auth-gateway (JWKS Key Sockets Exhaustion)',
+  driverDetail: 'OIDC validation socket pool at 100% capacity; incoming tokens queued with 1.45s TLS handshake timeouts.',
+};
+
+export const BASE_PREDICTIONS: FailurePredictionItem[] = [
   {
     serviceId: 'inventory-service',
     serviceName: 'inventory-service',
@@ -765,7 +1021,27 @@ export const PREDICTIONS: FailurePredictionItem[] = [
   },
 ];
 
-export const HISTORICAL_INCIDENTS = [
+export const AUTH_FAIL_PREDICTIONS: FailurePredictionItem[] = [
+  AUTH_PREDICTION_ITEM,
+  ...BASE_PREDICTIONS,
+];
+
+export let PREDICTIONS: FailurePredictionItem[] = [...BASE_PREDICTIONS];
+
+export const AUTH_HISTORICAL_ITEM = {
+  id: 'INC-8945',
+  title: 'Auth gateway JWKS stall & token failure',
+  severity: 'CRIT',
+  started: '14:38 UTC',
+  duration: '11m 45s',
+  rootCauseNode: 'auth-gateway',
+  blastRadius: '3 services',
+  outcome: 'Active',
+  rcaConf: '95%',
+  isCurrent: true,
+};
+
+export const BASE_HISTORICAL_INCIDENTS = [
   {
     id: 'INC-8941',
     title: 'DB latency cascade',
@@ -857,7 +1133,55 @@ export const HISTORICAL_INCIDENTS = [
   },
 ];
 
-export const MOCK_LOGS: LogEntry[] = [
+export const AUTH_FAIL_HISTORICAL_INCIDENTS = [
+  AUTH_HISTORICAL_ITEM,
+  ...BASE_HISTORICAL_INCIDENTS,
+];
+
+export let HISTORICAL_INCIDENTS = [...BASE_HISTORICAL_INCIDENTS];
+
+export const AUTH_MOCK_LOGS: LogEntry[] = [
+  {
+    id: 'log-auth-1',
+    timestamp: '14:38:12.105',
+    level: 'ERROR',
+    service: 'auth-gateway',
+    traceId: '8ba32f',
+    spanId: 'a71e99',
+    causalAttribution: 'ROOT CAUSE ANOMALY',
+    message: 'OIDC token verification timeout: JWKS keystore upstream timed out after 1450ms on /oauth/token (pool exhausted: 100/100 connections in use)',
+    host: 'auth-gw.ingress.us-east.internal',
+    isIncidentAnchor: true,
+    structuredAttributes: {
+      gateway: 'auth-gateway',
+      endpoint: '/oauth/v2/token',
+      status_code: 504,
+      error_reason: 'JWKS_UPSTREAM_TIMEOUT',
+      duration_ms: 1450.0,
+      active_connections: 100,
+      queue_depth: 342,
+    },
+  },
+  {
+    id: 'log-auth-2',
+    timestamp: '14:38:15.420',
+    level: 'ERROR',
+    service: 'api-gateway',
+    traceId: '8ba32f',
+    spanId: 'a71e01',
+    causalAttribution: 'DOWNSTREAM CASCADE',
+    message: 'Upstream auth-gateway responded with HTTP 502 Bad Gateway during bearer token authorization check on ingress',
+    host: 'api-gw.ingress.us-east.internal',
+    structuredAttributes: {
+      upstream: 'auth-gateway',
+      status_code: 502,
+      route: '/api/v1/orders',
+      client_ip: '10.240.12.84',
+    },
+  },
+];
+
+export const BASE_MOCK_LOGS: LogEntry[] = [
   {
     id: 'log-1',
     timestamp: '14:32:07.481',
@@ -1039,7 +1363,33 @@ export const MOCK_LOGS: LogEntry[] = [
   },
 ];
 
-export const MOCK_TRACE_SPANS: TraceSpan[] = [
+export const AUTH_FAIL_MOCK_LOGS: LogEntry[] = [
+  ...AUTH_MOCK_LOGS,
+  ...BASE_MOCK_LOGS,
+];
+
+export let MOCK_LOGS: LogEntry[] = [...BASE_MOCK_LOGS];
+
+export const AUTH_TRACE_SPAN: TraceSpan = {
+  id: 'span-auth-gw-1',
+  parentId: 'span-gw-1',
+  service: 'auth-gateway',
+  operation: 'oauth.VerifyBearerToken',
+  startOffsetMs: 15,
+  durationMs: 1450,
+  status: 'CRITICAL',
+  selfTimeMs: 1450,
+  statusText: '1.45s (504 Gateway Timeout) · JWKS Exhaustion',
+  depth: 1,
+  attributes: {
+    'http.status_code': 504,
+    'auth.protocol': 'OAuth2 / OIDC',
+    'auth.error': 'jwks_connection_timeout',
+    'peer.service': 'auth-gateway',
+  },
+};
+
+export const BASE_MOCK_TRACE_SPANS: TraceSpan[] = [
   {
     id: 'span-gw-1',
     service: 'api-gateway',
@@ -1162,3 +1512,34 @@ export const MOCK_TRACE_SPANS: TraceSpan[] = [
     },
   },
 ];
+
+export const AUTH_FAIL_MOCK_TRACE_SPANS: TraceSpan[] = [
+  BASE_MOCK_TRACE_SPANS[0],
+  AUTH_TRACE_SPAN,
+  ...BASE_MOCK_TRACE_SPANS.slice(1),
+];
+
+export let MOCK_TRACE_SPANS: TraceSpan[] = [...BASE_MOCK_TRACE_SPANS];
+
+export function applyMockFault(fault: string | null) {
+  if (fault === 'auth-gateway') {
+    SERVICES = [...AUTH_FAIL_SERVICES];
+    TOPOLOGY_EDGES = [...AUTH_FAIL_TOPOLOGY_EDGES];
+    ACTIVE_INCIDENTS = [...AUTH_FAIL_ACTIVE_INCIDENTS];
+    MOCK_LOGS = [...AUTH_FAIL_MOCK_LOGS];
+    MOCK_TRACE_SPANS = [...AUTH_FAIL_MOCK_TRACE_SPANS];
+    PREDICTIONS = [...AUTH_FAIL_PREDICTIONS];
+    HISTORICAL_INCIDENTS = [...AUTH_FAIL_HISTORICAL_INCIDENTS];
+    SIMULATION_SCENARIOS = [...AUTH_FAIL_SIMULATION_SCENARIOS];
+  } else {
+    SERVICES = [...BASE_SERVICES];
+    TOPOLOGY_EDGES = [...BASE_TOPOLOGY_EDGES];
+    ACTIVE_INCIDENTS = [...BASE_ACTIVE_INCIDENTS];
+    MOCK_LOGS = [...BASE_MOCK_LOGS];
+    MOCK_TRACE_SPANS = [...BASE_MOCK_TRACE_SPANS];
+    PREDICTIONS = [...BASE_PREDICTIONS];
+    HISTORICAL_INCIDENTS = [...BASE_HISTORICAL_INCIDENTS];
+    SIMULATION_SCENARIOS = [...BASE_SIMULATION_SCENARIOS];
+  }
+}
+

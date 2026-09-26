@@ -1,19 +1,25 @@
-import React, { useState } from 'react';
-import { HISTORICAL_INCIDENTS } from '../data/mockData';
+import React, { useState, useEffect } from 'react';
 import { AppPage } from '../components/layout/AppShell';
+import { useDemoState } from '../context/DemoStateContext';
 
 interface IncidentHistoryViewProps {
   onNavigate: (page: AppPage) => void;
 }
 
 export const IncidentHistoryView: React.FC<IncidentHistoryViewProps> = ({ onNavigate }) => {
-  const [selectedIncidentId, setSelectedIncidentId] = useState<string>('INC-8941');
+  const { historicalIncidents, activeFault } = useDemoState();
+  const isAuthFail = activeFault === 'auth-gateway';
+  const [selectedIncidentId, setSelectedIncidentId] = useState<string>(isAuthFail ? 'INC-8945' : 'INC-8941');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<string>('30d');
 
-  const filteredIncidents = HISTORICAL_INCIDENTS.filter((inc) => {
+  useEffect(() => {
+    setSelectedIncidentId(isAuthFail ? 'INC-8945' : 'INC-8941');
+  }, [isAuthFail]);
+
+  const filteredIncidents = historicalIncidents.filter((inc) => {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       if (!inc.id.toLowerCase().includes(q) && !inc.title.toLowerCase().includes(q) && !inc.rootCauseNode.toLowerCase().includes(q)) {
@@ -315,12 +321,18 @@ export const IncidentHistoryView: React.FC<IncidentHistoryViewProps> = ({ onNavi
               <span className="font-section text-[10px] text-[#70797B] font-semibold uppercase">
                 INCIDENT INSPECTOR / SCM AUDIT RECORD
               </span>
-              <span className="px-1.5 py-0.5 rounded-[2px] bg-[#2F7D5C]/10 text-[#2F7D5C] font-code text-[9.5px] font-semibold border border-[#2F7D5C]/30">
-                ● RESOLVED
+              <span className={`px-1.5 py-0.5 rounded-[2px] font-code text-[9.5px] font-semibold border ${
+                selectedIncidentId === 'INC-8945'
+                  ? 'bg-[#B83A3A]/10 text-[#B83A3A] border-[#B83A3A]/30'
+                  : 'bg-[#2F7D5C]/10 text-[#2F7D5C] border-[#2F7D5C]/30'
+              }`}>
+                {selectedIncidentId === 'INC-8945' ? '● ACTIVE INVESTIGATION' : '● RESOLVED'}
               </span>
             </div>
             <h2 className="text-[15px] font-bold text-[#171A19] tracking-tight">
-              INC-8941: Database Latency Cascade
+              {selectedIncidentId === 'INC-8945'
+                ? 'INC-8945: Auth Gateway Token Validation Bottleneck'
+                : 'INC-8941: Database Latency Cascade'}
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 pt-1 border-t border-[#D9DCD8] font-code text-[10px]">
               <div>
@@ -329,15 +341,15 @@ export const IncidentHistoryView: React.FC<IncidentHistoryViewProps> = ({ onNavi
               </div>
               <div>
                 <span className="text-[#70797B] block">STARTED</span>
-                <span className="text-[#171A19] font-medium">14:32:07 UTC</span>
+                <span className="text-[#171A19] font-medium">{selectedIncidentId === 'INC-8945' ? 'Just now' : '14:32:07 UTC'}</span>
               </div>
               <div>
                 <span className="text-[#70797B] block">DURATION</span>
-                <span className="text-[#171A19] font-medium">7m 24s</span>
+                <span className="text-[#171A19] font-medium">{selectedIncidentId === 'INC-8945' ? '3m 15s' : '7m 24s'}</span>
               </div>
               <div>
                 <span className="text-[#70797B] block">RCA CONF</span>
-                <span className="text-[#00535f] font-bold">91% (SCM-V3)</span>
+                <span className="text-[#00535f] font-bold">{selectedIncidentId === 'INC-8945' ? '94% (SCM-V3)' : '91% (SCM-V3)'}</span>
               </div>
             </div>
           </div>
@@ -351,50 +363,101 @@ export const IncidentHistoryView: React.FC<IncidentHistoryViewProps> = ({ onNavi
               <span className="text-[#70797B] text-[9.5px]">OBSERVED DAG DIRECTED VECTORS</span>
             </div>
             <div className="space-y-1 pt-0.5">
-              <div className="p-1.5 rounded bg-[#B83A3A]/5 border border-[#B83A3A]/20 flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="px-1 py-0.2 rounded bg-[#B83A3A] text-white font-bold text-[9px]">T0 ROOT</span>
-                  <span className="font-bold text-[#171A19]">inventory-db</span>
-                  <span className="text-[#B83A3A] font-semibold">CRITICAL</span>
-                </div>
-                <span className="text-[#5E6561]">Disk I/O Spike · Latency 1.42s</span>
-              </div>
-              <div className="flex items-center gap-1.5 pl-3 text-[#00535f] text-[10px]">
-                <span className="material-symbols-outlined text-[13px]">arrow_downward</span>
-                <span>+2.1s propagation lag (Connection lease starvation)</span>
-              </div>
-              <div className="p-1.5 rounded bg-[#F7F7F5] border border-[#D9DCD8] flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="px-1 py-0.2 rounded bg-[#D9822B] text-white font-medium text-[9px]">L1</span>
-                  <span className="font-semibold text-[#171A19]">inventory-service</span>
-                  <span className="text-[#D9822B] font-semibold">DEGRADED</span>
-                </div>
-                <span className="text-[#5E6561]">Pool lock saturation (198/200)</span>
-              </div>
-              <div className="flex items-center gap-1.5 pl-3 text-[#00535f] text-[10px]">
-                <span className="material-symbols-outlined text-[13px]">arrow_downward</span>
-                <span>+4.8s propagation lag (gRPC retry queue backlog)</span>
-              </div>
-              <div className="p-1.5 rounded bg-[#F7F7F5] border border-[#D9DCD8] flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="px-1 py-0.2 rounded bg-[#D9822B] text-white font-medium text-[9px]">L2</span>
-                  <span className="font-semibold text-[#171A19]">order-service</span>
-                  <span className="text-[#D9822B] font-semibold">DEGRADED</span>
-                </div>
-                <span className="text-[#5E6561]">Synchronous RPC retry timeouts</span>
-              </div>
-              <div className="flex items-center gap-1.5 pl-3 text-[#00535f] text-[10px]">
-                <span className="material-symbols-outlined text-[13px]">arrow_downward</span>
-                <span>+7.2s propagation lag (Edge ingress backlog)</span>
-              </div>
-              <div className="p-1.5 rounded bg-[#B83A3A]/5 border border-[#B83A3A]/20 flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="px-1 py-0.2 rounded bg-[#B83A3A] text-white font-bold text-[9px]">EDGE</span>
-                  <span className="font-semibold text-[#171A19]">api-gateway</span>
-                  <span className="text-[#B83A3A] font-semibold">504 SLA BREACH</span>
-                </div>
-                <span className="text-[#5E6561]">7.2% errors</span>
-              </div>
+              {selectedIncidentId === 'INC-8945' ? (
+                <>
+                  <div className="p-1.5 rounded bg-[#B83A3A]/5 border border-[#B83A3A]/20 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1 py-0.2 rounded bg-[#B83A3A] text-white font-bold text-[9px]">T0 ROOT</span>
+                      <span className="font-bold text-[#171A19]">auth-gateway</span>
+                      <span className="text-[#B83A3A] font-semibold">CRITICAL</span>
+                    </div>
+                    <span className="text-[#5E6561]">JWKS Invalidation · P99 1.45s</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 pl-3 text-[#00535f] text-[10px]">
+                    <span className="material-symbols-outlined text-[13px]">arrow_downward</span>
+                    <span>+1.4s propagation lag (Synchronous JWT validation backlog)</span>
+                  </div>
+                  <div className="p-1.5 rounded bg-[#F7F7F5] border border-[#D9DCD8] flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1 py-0.2 rounded bg-[#D9822B] text-white font-medium text-[9px]">L1</span>
+                      <span className="font-semibold text-[#171A19]">api-gateway</span>
+                      <span className="text-[#D9822B] font-semibold">DEGRADED</span>
+                    </div>
+                    <span className="text-[#5E6561]">Upstream Auth Handshake Timeouts</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 pl-3 text-[#00535f] text-[10px]">
+                    <span className="material-symbols-outlined text-[13px]">arrow_downward</span>
+                    <span>+3.2s propagation lag (Ingress routing backpressure)</span>
+                  </div>
+                  <div className="p-1.5 rounded bg-[#F7F7F5] border border-[#D9DCD8] flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1 py-0.2 rounded bg-[#D9822B] text-white font-medium text-[9px]">L2</span>
+                      <span className="font-semibold text-[#171A19]">order-service</span>
+                      <span className="text-[#D9822B] font-semibold">DEGRADED</span>
+                    </div>
+                    <span className="text-[#5E6561]">Auth header verification stalls</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 pl-3 text-[#00535f] text-[10px]">
+                    <span className="material-symbols-outlined text-[13px]">arrow_downward</span>
+                    <span>+5.8s propagation lag (Edge ingress failure cascade)</span>
+                  </div>
+                  <div className="p-1.5 rounded bg-[#B83A3A]/5 border border-[#B83A3A]/20 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1 py-0.2 rounded bg-[#B83A3A] text-white font-bold text-[9px]">EDGE</span>
+                      <span className="font-semibold text-[#171A19]">payment-service</span>
+                      <span className="text-[#2F7D5C] font-semibold">PROTECTED</span>
+                    </div>
+                    <span className="text-[#5E6561]">Circuit breaker isolated</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="p-1.5 rounded bg-[#B83A3A]/5 border border-[#B83A3A]/20 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1 py-0.2 rounded bg-[#B83A3A] text-white font-bold text-[9px]">T0 ROOT</span>
+                      <span className="font-bold text-[#171A19]">inventory-db</span>
+                      <span className="text-[#B83A3A] font-semibold">CRITICAL</span>
+                    </div>
+                    <span className="text-[#5E6561]">Disk I/O Spike · Latency 1.42s</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 pl-3 text-[#00535f] text-[10px]">
+                    <span className="material-symbols-outlined text-[13px]">arrow_downward</span>
+                    <span>+2.1s propagation lag (Connection lease starvation)</span>
+                  </div>
+                  <div className="p-1.5 rounded bg-[#F7F7F5] border border-[#D9DCD8] flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1 py-0.2 rounded bg-[#D9822B] text-white font-medium text-[9px]">L1</span>
+                      <span className="font-semibold text-[#171A19]">inventory-service</span>
+                      <span className="text-[#D9822B] font-semibold">DEGRADED</span>
+                    </div>
+                    <span className="text-[#5E6561]">Pool lock saturation (198/200)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 pl-3 text-[#00535f] text-[10px]">
+                    <span className="material-symbols-outlined text-[13px]">arrow_downward</span>
+                    <span>+4.8s propagation lag (gRPC retry queue backlog)</span>
+                  </div>
+                  <div className="p-1.5 rounded bg-[#F7F7F5] border border-[#D9DCD8] flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1 py-0.2 rounded bg-[#D9822B] text-white font-medium text-[9px]">L2</span>
+                      <span className="font-semibold text-[#171A19]">order-service</span>
+                      <span className="text-[#D9822B] font-semibold">DEGRADED</span>
+                    </div>
+                    <span className="text-[#5E6561]">Synchronous RPC retry timeouts</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 pl-3 text-[#00535f] text-[10px]">
+                    <span className="material-symbols-outlined text-[13px]">arrow_downward</span>
+                    <span>+7.2s propagation lag (Edge ingress backlog)</span>
+                  </div>
+                  <div className="p-1.5 rounded bg-[#B83A3A]/5 border border-[#B83A3A]/20 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1 py-0.2 rounded bg-[#B83A3A] text-white font-bold text-[9px]">EDGE</span>
+                      <span className="font-semibold text-[#171A19]">api-gateway</span>
+                      <span className="text-[#B83A3A] font-semibold">504 SLA BREACH</span>
+                    </div>
+                    <span className="text-[#5E6561]">7.2% errors</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 

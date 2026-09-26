@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SERVICES } from '../data/mockData';
+import { useDemoState } from '../context/DemoStateContext';
 import { ServiceNode, ServiceStatus, ServiceType, CausalRole } from '../types';
 import { AppPage } from '../components/layout/AppShell';
 
@@ -8,6 +8,8 @@ interface ServicesViewProps {
 }
 
 export const ServicesView: React.FC<ServicesViewProps> = ({ onNavigate }) => {
+  const { activeFault, services: demoServices } = useDemoState();
+  const isAuthFail = activeFault === 'auth-gateway';
   const [selectedServiceId, setSelectedServiceId] = useState<string>('inventory-service');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -15,10 +17,15 @@ export const ServicesView: React.FC<ServicesViewProps> = ({ onNavigate }) => {
   const [causalFilter, setCausalFilter] = useState<string>('all');
   const [sortField, setSortField] = useState<'risk' | 'latency' | 'name'>('risk');
 
-  const selectedService = SERVICES.find((s) => s.id === selectedServiceId) || SERVICES[0];
+  const selectedService = demoServices.find((s) => s.id === selectedServiceId) || demoServices[0];
+
+  const healthyCount = demoServices.filter(s => s.status === 'healthy').length;
+  const degradedCount = demoServices.filter(s => s.status === 'degraded').length;
+  const warningCount = demoServices.filter(s => s.status === 'warning').length;
+  const criticalCount = demoServices.filter(s => s.status === 'critical').length;
 
   // Filter logic
-  const filteredServices = SERVICES.filter((s) => {
+  const filteredServices = demoServices.filter((s) => {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const matchName = s.name.toLowerCase().includes(q) || s.displayName.toLowerCase().includes(q);
@@ -70,19 +77,19 @@ export const ServicesView: React.FC<ServicesViewProps> = ({ onNavigate }) => {
               <div className="flex items-center gap-4 flex-wrap">
                 <span className="inline-flex items-center gap-1.5 text-[#171A19]">
                   <span className="w-2 h-2 rounded-[2px] bg-[#2F7D5C]"></span>
-                  <strong className="font-semibold">39</strong> Healthy
+                  <strong className="font-semibold">{healthyCount}</strong> Healthy
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-[#171A19]">
                   <span className="w-2 h-2 rounded-[2px] bg-[#D9822B]"></span>
-                  <strong className="font-semibold">5</strong> Degraded
+                  <strong className="font-semibold">{degradedCount}</strong> Degraded
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-[#171A19]">
                   <span className="w-2 h-2 rounded-[2px] bg-[#B7791F]"></span>
-                  <strong className="font-semibold">2</strong> Warning
+                  <strong className="font-semibold">{warningCount}</strong> Warning
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-[#B83A3A]">
-                  <span className="w-2 h-2 rounded-[2px] bg-[#B83A3A]"></span>
-                  <strong className="font-semibold">1</strong> Critical (ROOT CAUSE INC-8941)
+                  <span className="w-2 h-2 rounded-[2px] bg-[#B83A3A] animate-pulse"></span>
+                  <strong className="font-semibold">{criticalCount}</strong> Critical ({isAuthFail ? 'auth-gateway & inventory-db' : 'inventory-db'})
                 </span>
               </div>
               <span className="text-[#70797B] font-code text-[10px]">47 / 47 RESPONDING</span>
@@ -90,10 +97,10 @@ export const ServicesView: React.FC<ServicesViewProps> = ({ onNavigate }) => {
 
             {/* Proportional Segmented Stacked Bar */}
             <div className="h-2 w-full flex rounded-[2px] overflow-hidden bg-[#EAECE8]">
-              <div className="h-full bg-[#2F7D5C]" style={{ width: '82.97%' }} title="39 Healthy Services (83%)"></div>
-              <div className="h-full bg-[#D9822B]" style={{ width: '10.64%' }} title="5 Degraded Services"></div>
-              <div className="h-full bg-[#B7791F]" style={{ width: '4.25%' }} title="2 Warning Services"></div>
-              <div className="h-full bg-[#B83A3A]" style={{ width: '2.14%' }} title="1 Critical Service (Root Cause)"></div>
+              <div className="h-full bg-[#2F7D5C]" style={{ width: `${(healthyCount / 47) * 100}%` }} title={`${healthyCount} Healthy Services`}></div>
+              <div className="h-full bg-[#D9822B]" style={{ width: `${(degradedCount / 47) * 100}%` }} title={`${degradedCount} Degraded Services`}></div>
+              <div className="h-full bg-[#B7791F]" style={{ width: `${(warningCount / 47) * 100}%` }} title={`${warningCount} Warning Services`}></div>
+              <div className="h-full bg-[#B83A3A]" style={{ width: `${(criticalCount / 47) * 100}%` }} title={`${criticalCount} Critical Services`}></div>
             </div>
 
             {/* Evaluation Principle Callout */}

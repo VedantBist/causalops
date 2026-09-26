@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { AppPage } from '../components/layout/AppShell';
+import { useDemoState } from '../context/DemoStateContext';
 
 interface MetricsViewProps {
   onNavigate: (page: AppPage) => void;
 }
 
 export const MetricsView: React.FC<MetricsViewProps> = ({ onNavigate }) => {
+  const { activeFault } = useDemoState();
+  const isAuthFail = activeFault === 'auth-gateway';
   const [selectedMetric, setSelectedMetric] = useState<string>('P99 Latency');
-  const [selectedService, setSelectedService] = useState<string>('inventory-service');
+  const [selectedService, setSelectedService] = useState<string>(isAuthFail ? 'auth-gateway' : 'inventory-service');
   const [timeWindow, setTimeWindow] = useState<string>('15m');
 
   return (
@@ -52,7 +55,9 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onNavigate }) => {
           <span className="text-[#70797B] uppercase text-[10px]">T0 ANCHOR:</span>
           <span className="font-semibold text-[#171A19]">14:32:07 UTC</span>
           <span className="w-1 h-1 rounded-full bg-[#70797B]"></span>
-          <span className="font-semibold text-[#B83A3A] uppercase">INC-8941 SYNCHRONIZED</span>
+          <span className="font-semibold text-[#B83A3A] uppercase">
+            {isAuthFail ? 'INC-8945 SYNCHRONIZED' : 'INC-8941 SYNCHRONIZED'}
+          </span>
         </div>
       </div>
 

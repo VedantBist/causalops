@@ -1,0 +1,9 @@
+{
+  "activeFault": null,
+  "incidentId": null,
+  "status": "HEALTHY",
+  "target": null,
+  "latencyMs": 42,
+  "errorRate": 0.01,
+  "injectedAt": null
+}

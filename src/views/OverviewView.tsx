@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Topology3D } from '../components/topology/Topology3D';
 import { ServiceInspector } from '../components/topology/ServiceInspector';
-import { SERVICES, CORE_INCIDENT, ACTIVE_INCIDENTS } from '../data/mockData';
 import { AppPage } from '../components/layout/AppShell';
-import { causalOpsApi, OverviewData, ServiceSummary } from '../api/client';
+import { causalOpsApi, OverviewData } from '../api/client';
+import { useDemoState } from '../context/DemoStateContext';
 
 interface OverviewViewProps {
   onNavigate: (page: AppPage) => void;
 }
 
 export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
+  const { activeFault, services: demoServices, activeIncidents: demoIncidents } = useDemoState();
   const [selectedNodeId, setSelectedNodeId] = useState<string>('inventory-db');
   const [isIncidentIsolated, setIsIncidentIsolated] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'3d' | '2d'>('3d');
@@ -40,14 +41,14 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
   const liveServices = overview?.services ?? null;
 
   // Map API service to mock format for existing ServiceInspector/Topology3D components
-  const topologyServices = liveServices ?? SERVICES;
+  const topologyServices = liveServices ?? demoServices;
 
   const selectedService =
-    (SERVICES.find((s) => s.id === selectedNodeId) ||
-     SERVICES.find((s) => s.id === 'inventory-db'))!;
+    (demoServices.find((s) => s.id === selectedNodeId) ||
+     demoServices.find((s) => s.id === 'inventory-db'))!;
 
-  const activeIncidents = overview?.activeIncidents ?? ACTIVE_INCIDENTS;
-  const systemStatus = overview?.systemStatus ?? 'Unknown';
+  const activeIncidents = overview?.activeIncidents ?? demoIncidents;
+  const systemStatus = overview?.systemStatus ?? (activeFault ? 'Degraded' : 'Operational');
 
   // Compute aggregated telemetry from live services
   const maxP99 = liveServices
@@ -213,25 +214,27 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
                   </div>
                 ) : (
                   <>
-                    {/* First/primary active incident */}
-                    <div className="p-3 bg-[#F7F7F5] border border-[#D9DCD8] rounded-[3px] mb-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-code text-[10px] text-[#B83A3A] font-bold uppercase px-1.5 py-0.5 bg-[#B83A3A]/10 rounded-[2px] border border-[#B83A3A]/30">
-                          {(activeIncidents[0] as any).severity ?? 'HIGH'} · ACTIVE
-                        </span>
-                        <span className="font-code text-[10px] text-[#70797B]">
-                          {(activeIncidents[0] as any).openedAt
-                            ? new Date((activeIncidents[0] as any).openedAt).toLocaleTimeString()
-                            : (activeIncidents[0] as any).startTime}
-                        </span>
+                    {/* Active incidents list */}
+                    {activeIncidents.slice(0, 2).map((inc) => (
+                      <div key={formatIncidentKey(inc)} className="p-3 bg-[#F7F7F5] border border-[#D9DCD8] rounded-[3px] mb-2.5">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-code text-[10px] text-[#B83A3A] font-bold uppercase px-1.5 py-0.5 bg-[#B83A3A]/10 rounded-[2px] border border-[#B83A3A]/30">
+                            {(inc as any).severity ?? 'HIGH'} · ACTIVE
+                          </span>
+                          <span className="font-code text-[10px] text-[#70797B]">
+                            {(inc as any).openedAt
+                              ? new Date((inc as any).openedAt).toLocaleTimeString()
+                              : (inc as any).startTime}
+                          </span>
+                        </div>
+                        <div className="font-code text-[12px] font-bold text-[#171A19]">
+                          {formatIncidentKey(inc)} — {(inc as any).title}
+                        </div>
+                        <p className="text-[11px] text-[#5E6561] mt-1 leading-snug">
+                          {(inc as any).summary}
+                        </p>
                       </div>
-                      <div className="font-code text-[13px] font-bold text-[#171A19]">
-                        {formatIncidentKey(activeIncidents[0])} — {(activeIncidents[0] as any).title}
-                      </div>
-                      <p className="text-[11.5px] text-[#5E6561] mt-1 leading-snug">
-                        {(activeIncidents[0] as any).summary}
-                      </p>
-                    </div>
+                    ))}
 
                     {/* Impact summary */}
                     <div className="font-section text-[10px] text-[#70797B] font-semibold tracking-wider uppercase mb-1.5">
@@ -247,7 +250,37 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate }) => {
                             <span className="text-[10px] text-[#70797B]">{Math.round(s.latencyP99)}ms p99</span>
                           </div>
                         )) ?? (
-                          <div className="text-[#B83A3A]">inventory-db (Origin Lock Contention)</div>
+                          activeFault === 'auth-gateway' ? (
+                            <>
+                              <div className="flex items-center justify-between text-[#B83A3A] font-semibold">
+                                <span>auth-gateway (Root JWKS Exhaustion)</span>
+                                <span className="text-[10px] text-[#70797B]">1,450ms p99</span>
+                              </div>
+                              <div className="flex items-center justify-between text-[#B83A3A] font-semibold">
+                                <span>inventory-db (Origin Lock Contention)</span>
+                                <span className="text-[10px] text-[#70797B]">1,420ms p99</span>
+                              </div>
+                              <div className="flex items-center justify-between text-[#C47F17]">
+                                <span>api-gateway (Downstream 502/504)</span>
+                                <span className="text-[10px] text-[#70797B]">842ms p99</span>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex items-center justify-between text-[#B83A3A] font-semibold">
+                                <span>inventory-db (Origin Lock Contention)</span>
+                                <span className="text-[10px] text-[#70797B]">1,420ms p99</span>
+                              </div>
+                              <div className="flex items-center justify-between text-[#C47F17]">
+                                <span>order-service (gRPC Pool Saturation)</span>
+                                <span className="text-[10px] text-[#70797B]">820ms p99</span>
+                              </div>
+                              <div className="flex items-center justify-between text-[#C47F17]">
+                                <span>api-gateway (Downstream 504 Timeout)</span>
+                                <span className="text-[10px] text-[#70797B]">842ms p99</span>
+                              </div>
+                            </>
+                          )
                         )
                       ) : (
                         <div className="text-[#2F7D5C]">All services healthy</div>

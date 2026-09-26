@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { SERVICES, TOPOLOGY_EDGES } from '../../data/mockData';
+import { useDemoState } from '../../context/DemoStateContext';
 import { ServiceNode } from '../../types';
 
 interface Topology3DProps {
@@ -23,6 +23,9 @@ export const Topology3D: React.FC<Topology3DProps> = ({
   onToggleViewMode,
   compact = false,
 }) => {
+  const { activeFault, services: currentServices, edges: currentEdges } = useDemoState();
+  const isAuthFail = activeFault === 'auth-gateway';
+
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hoveredNode, setHoveredNode] = useState<ServiceNode | null>(null);
@@ -131,12 +134,12 @@ export const Topology3D: React.FC<Topology3DProps> = ({
     const nodeGroup = new THREE.Group();
     scene.add(nodeGroup);
 
-    SERVICES.forEach((service) => {
+    currentServices.forEach((service) => {
       const group = new THREE.Group();
       group.name = service.id;
 
       // Base Box Dimensions
-      const isRoot = service.id === 'inventory-db';
+      const isRoot = service.id === 'inventory-db' || (isAuthFail && service.id === 'auth-gateway');
       const isCrit = service.status === 'critical' || service.status === 'degraded';
       const width = isRoot ? 3.0 : 2.6;
       const height = isRoot ? 1.4 : 1.1;
@@ -219,9 +222,9 @@ export const Topology3D: React.FC<Topology3DProps> = ({
     const edgeGroup = new THREE.Group();
     scene.add(edgeGroup);
 
-    TOPOLOGY_EDGES.forEach((edge) => {
-      const srcNode = SERVICES.find((s) => s.id === edge.source);
-      const tgtNode = SERVICES.find((s) => s.id === edge.target);
+    currentEdges.forEach((edge) => {
+      const srcNode = currentServices.find((s) => s.id === edge.source);
+      const tgtNode = currentServices.find((s) => s.id === edge.target);
       if (!srcNode || !tgtNode) return;
 
       const p1 = new THREE.Vector3(srcNode.pos3D[0], srcNode.pos3D[1], srcNode.pos3D[2]);
@@ -348,7 +351,7 @@ export const Topology3D: React.FC<Topology3DProps> = ({
       }
       renderer.dispose();
     };
-  }, []);
+  }, [isAuthFail, currentServices, currentEdges]);
 
   // Update camera based on spherical coords
   const updateCameraPosition = () => {
@@ -378,7 +381,7 @@ export const Topology3D: React.FC<Topology3DProps> = ({
   // Adjust for incident isolation mode
   useEffect(() => {
     nodeMeshesRef.current.forEach((mesh, id) => {
-      const service = SERVICES.find((s) => s.id === id);
+      const service = currentServices.find((s) => s.id === id);
       if (!service) return;
 
       if (isIncidentIsolated) {
@@ -391,7 +394,7 @@ export const Topology3D: React.FC<Topology3DProps> = ({
         mesh.visible = true;
       }
     });
-  }, [isIncidentIsolated]);
+  }, [isIncidentIsolated, currentServices]);
 
   // Mouse interaction handlers for orbit, pan, zoom, click
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -445,7 +448,7 @@ export const Topology3D: React.FC<Topology3DProps> = ({
     if (intersects.length > 0) {
       const parentGroup = intersects[0].object.parent;
       if (parentGroup && parentGroup.name) {
-        const found = SERVICES.find((s) => s.id === parentGroup.name);
+        const found = currentServices.find((s) => s.id === parentGroup.name);
         setHoveredNode(found || null);
         return;
       }
@@ -496,7 +499,7 @@ export const Topology3D: React.FC<Topology3DProps> = ({
   };
 
   const handleFocusNode = (nodeId: string) => {
-    const node = SERVICES.find((s) => s.id === nodeId);
+    const node = currentServices.find((s) => s.id === nodeId);
     if (!node) return;
     cameraTargetRef.current.set(node.pos3D[0], node.pos3D[1], node.pos3D[2]);
     cameraSphericalRef.current.radius = 12;
@@ -659,7 +662,10 @@ export const Topology3D: React.FC<Topology3DProps> = ({
       {/* MINIMAP (LOWER LEFT) */}
       <div className="absolute bottom-10 left-4 z-20 p-1.5 bg-[#0E1419]/90 border border-[#1E2B38] rounded-[2px] backdrop-blur pointer-events-auto">
         <div className="w-24 h-12 bg-[#080B0E] relative border border-[#16212B]">
-          <div className="absolute left-3 top-2 w-1.5 h-1 bg-[#476785]" title="auth-gateway"></div>
+          <div
+            className={`absolute left-3 top-2 w-2 h-1.5 rounded-[1px] ${isAuthFail ? 'bg-[#B83A3A] animate-pulse' : 'bg-[#476785]'}`}
+            title={isAuthFail ? "auth-gateway (CRITICAL INCIDENT)" : "auth-gateway (nominal)"}
+          ></div>
           <div className="absolute left-3 top-5 w-2 h-1 bg-[#B83A3A]" title="api-gateway"></div>
           <div className="absolute left-3 top-8 w-1.5 h-1 bg-[#476785]" title="web-gateway"></div>
           <div className="absolute left-10 top-2 w-1.5 h-1 bg-[#476785]" title="auth-service"></div>

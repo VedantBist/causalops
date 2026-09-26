@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Topology3D } from '../components/topology/Topology3D';
 import { ServiceInspector } from '../components/topology/ServiceInspector';
-import { SERVICES } from '../data/mockData';
+import { useDemoState } from '../context/DemoStateContext';
 import { AppPage } from '../components/layout/AppShell';
 
 interface TopologyViewProps {
@@ -9,6 +9,8 @@ interface TopologyViewProps {
 }
 
 export const TopologyView: React.FC<TopologyViewProps> = ({ onNavigate }) => {
+  const { activeFault, services: demoServices } = useDemoState();
+  const isAuthFail = activeFault === 'auth-gateway';
   const [selectedNodeId, setSelectedNodeId] = useState<string>('inventory-db');
   const [isIncidentIsolated, setIsIncidentIsolated] = useState<boolean>(true);
   const [viewMode, setViewMode] = useState<'3d' | '2d'>('3d');
@@ -20,7 +22,7 @@ export const TopologyView: React.FC<TopologyViewProps> = ({ onNavigate }) => {
     external: true,
   });
 
-  const selectedService = SERVICES.find((s) => s.id === selectedNodeId) || SERVICES.find((s) => s.id === 'inventory-db')!;
+  const selectedService = demoServices.find((s) => s.id === selectedNodeId) || demoServices.find((s) => s.id === 'inventory-db')!;
 
   return (
     <div className="flex flex-col w-full h-[calc(100vh-2.75rem)] overflow-hidden select-none bg-[#090D10] text-[#D8E1E8] font-sans">
@@ -33,7 +35,16 @@ export const TopologyView: React.FC<TopologyViewProps> = ({ onNavigate }) => {
           <div>
             <h1 className="text-[14px] font-bold text-[#171A19]">Service Dependency &amp; Causal Mesh</h1>
             <p className="text-[10.5px] text-[#5E6561]">
-              Live propagation path: <span className="font-semibold text-[#B83A3A]">inventory-db</span> → inventory-service → order-service → api-gateway
+              Live propagation path{isAuthFail ? 's' : ''}:{' '}
+              {isAuthFail ? (
+                <>
+                  <span className="font-semibold text-[#B83A3A]">auth-gateway</span> → api-gateway · <span className="font-semibold text-[#B83A3A]">inventory-db</span> → order-service → api-gateway
+                </>
+              ) : (
+                <>
+                  <span className="font-semibold text-[#B83A3A]">inventory-db</span> → inventory-service → order-service → api-gateway
+                </>
+              )}
             </p>
           </div>
         </div>

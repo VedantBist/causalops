@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { PREDICTIONS } from '../data/mockData';
+import { useDemoState } from '../context/DemoStateContext';
 import { AppPage } from '../components/layout/AppShell';
 import { causalOpsApi, Prediction } from '../api/client';
 import { FailurePredictionItem } from '../types';
@@ -30,6 +30,7 @@ function mapApiPrediction(p: Prediction): FailurePredictionItem {
 }
 
 export const PredictionsView: React.FC<PredictionsViewProps> = ({ onNavigate }) => {
+  const { predictions: demoPredictions } = useDemoState();
   const [selectedServiceId, setSelectedServiceId] = useState<string>('inventory-service');
   const [horizon, setHorizon] = useState<'5m' | '15m' | '30m'>('15m');
   const [filterMode, setFilterMode] = useState<'all' | 'high_risk'>('all');
@@ -66,7 +67,7 @@ export const PredictionsView: React.FC<PredictionsViewProps> = ({ onNavigate }) 
   }, [loadPredictions]);
 
   // Prefer live data; fall back to mock
-  const allPredictions = livePredictions.length > 0 ? livePredictions : PREDICTIONS;
+  const allPredictions = livePredictions.length > 0 ? livePredictions : demoPredictions;
   const selectedPrediction = allPredictions.find((p) => p.serviceId === selectedServiceId) || allPredictions[0];
   const displayedPredictions = filterMode === 'high_risk'
     ? allPredictions.filter((p) => p.riskProbability >= 60)
@@ -365,7 +366,7 @@ export const PredictionsView: React.FC<PredictionsViewProps> = ({ onNavigate }) 
                     filterMode === 'all' ? 'bg-[#00535f] text-white font-semibold' : 'text-[#5E6561] hover:text-[#171A19]'
                   }`}
                 >
-                  ALL TOPOLOGIES ({PREDICTIONS.length})
+                  ALL TOPOLOGIES ({allPredictions.length})
                 </button>
                 <button
                   onClick={() => setFilterMode('high_risk')}

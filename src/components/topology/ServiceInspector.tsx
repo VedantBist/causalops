@@ -1,5 +1,6 @@
 import React from 'react';
 import { ServiceNode } from '../../types';
+import { useDemoState } from '../../context/DemoStateContext';
 
 interface ServiceInspectorProps {
   service: ServiceNode;
@@ -12,7 +13,10 @@ export const ServiceInspector: React.FC<ServiceInspectorProps> = ({
   onInvestigateRootCause,
   onIsolateSubgraph,
 }) => {
-  const isRootCause = service.id === 'inventory-db';
+  const { activeFault } = useDemoState();
+  const isAuthFail = activeFault === 'auth-gateway';
+  const isRootCause = service.id === 'inventory-db' || (isAuthFail && service.id === 'auth-gateway');
+  const rcaScore = (isAuthFail && service.id === 'auth-gateway') ? '94.8%' : '98.4%';
 
   return (
     <div className="w-full bg-[#FFFFFF] text-[#161D1A] flex flex-col h-full overflow-y-auto select-none font-sans border-l border-[#D9DCD8]">
@@ -22,7 +26,7 @@ export const ServiceInspector: React.FC<ServiceInspectorProps> = ({
           <span className="font-section text-[10px] text-[#636F6B] font-semibold">SELECTED COMPONENT</span>
           {isRootCause ? (
             <span className="px-1.5 py-0.5 rounded-[2px] bg-[#B83A3A]/10 border border-[#B83A3A]/30 text-[#B83A3A] font-code text-[10px] font-semibold">
-              ROOT CAUSE (98.4%)
+              ROOT CAUSE ({rcaScore})
             </span>
           ) : (
             <span
@@ -52,7 +56,17 @@ export const ServiceInspector: React.FC<ServiceInspectorProps> = ({
       </div>
 
       {/* CRITICAL DIAGNOSTIC NOTE STRIP */}
-      {isRootCause ? (
+      {service.id === 'auth-gateway' && isAuthFail ? (
+        <div className="px-3 py-2 bg-[#FFF2F0] border-b border-[#FFD5D0] flex items-start gap-2">
+          <span className="material-symbols-outlined text-[16px] text-[#B83A3A] shrink-0 mt-0.5">crisis_alert</span>
+          <div>
+            <div className="text-[11px] font-semibold text-[#8C1B1B]">JWKS Connection Pool Exhaustion &amp; Auth Timeouts</div>
+            <div className="text-[10px] text-[#9E3535] leading-tight mt-0.5">
+              OIDC token validation pool saturated (100/100 leases). P99 latency spiked to 1,450ms, returning 502/504 Bad Gateway to API ingress.
+            </div>
+          </div>
+        </div>
+      ) : isRootCause ? (
         <div className="px-3 py-2 bg-[#FFF2F0] border-b border-[#FFD5D0] flex items-start gap-2">
           <span className="material-symbols-outlined text-[16px] text-[#B83A3A] shrink-0 mt-0.5">crisis_alert</span>
           <div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDemoState } from '../../context/DemoStateContext';
 
 export type AppPage =
   | 'overview'
@@ -34,6 +35,9 @@ const PAGE_TITLES: Record<AppPage, string> = {
 };
 
 export const AppShell: React.FC<AppShellProps> = ({ currentPage, onNavigate, children }) => {
+  const { activeFault } = useDemoState();
+  const isAuthFail = activeFault === 'auth-gateway';
+
   return (
     <div className="min-h-screen bg-[#F7F7F5] text-[#171A19] flex select-none font-sans">
       {/* PERSISTENT 224px LEFT NAVIGATION RAIL */}
@@ -202,9 +206,9 @@ export const AppShell: React.FC<AppShellProps> = ({ currentPage, onNavigate, chi
         {/* Bottom Rail Info */}
         <div className="p-3 border-t border-[#D9DCD8] bg-[#F1F2F0]">
           <div className="font-code text-[10px] text-[#5E6561] mb-1">47 services · 183 deps</div>
-          <div className="flex items-center gap-1.5 font-code text-[10.5px] font-semibold text-[#2F7D5C]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#2F7D5C]"></span>
-            <span>Operational</span>
+          <div className={`flex items-center gap-1.5 font-code text-[10.5px] font-semibold ${isAuthFail ? 'text-[#B83A3A]' : 'text-[#2F7D5C]'}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${isAuthFail ? 'bg-[#B83A3A] animate-pulse' : 'bg-[#2F7D5C]'}`}></span>
+            <span>{isAuthFail ? 'Degraded (auth-gateway)' : 'Operational'}</span>
           </div>
         </div>
       </aside>
@@ -220,12 +224,33 @@ export const AppShell: React.FC<AppShellProps> = ({ currentPage, onNavigate, chi
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Demo Status Indicator */}
+            {isAuthFail ? (
+              <div
+                className="hidden xl:flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] bg-[#B83A3A]/10 border border-[#B83A3A]/40 text-[#B83A3A] font-code text-[10px] font-bold tracking-tight"
+                title="Active Fault: Run ./demo-restore.sh to heal system"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-[#B83A3A] animate-ping" />
+                <span>FAULT: auth-gateway · (restore: ./demo-restore.sh)</span>
+              </div>
+            ) : (
+              <div
+                className="hidden xl:flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] bg-[#286B78]/10 border border-[#286B78]/30 text-[#286B78] font-code text-[10px] font-medium"
+                title="Baseline Healthy: Run ./demo-fail-auth.sh in terminal to inject failure"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-[#286B78]" />
+                <span>DEMO READY · (inject: ./demo-fail-auth.sh)</span>
+              </div>
+            )}
+
             {/* System Status */}
             <div className="hidden md:flex items-center gap-2.5 pl-3 border-l border-[#D9DCD8]">
               <div className="flex items-center gap-1.5 font-code text-[11px] text-[#5E6561]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#2F7D5C]"></span>
+                <span className={`w-1.5 h-1.5 rounded-full ${isAuthFail ? 'bg-[#B83A3A] animate-pulse' : 'bg-[#2F7D5C]'}`}></span>
                 <span className="text-[#171A19] font-medium">Status:</span>
-                <span className="text-[#2F7D5C] font-semibold">Operational</span>
+                <span className={isAuthFail ? 'text-[#B83A3A] font-semibold' : 'text-[#2F7D5C] font-semibold'}>
+                  {isAuthFail ? 'Degraded (INC-8945)' : 'Operational'}
+                </span>
               </div>
               <span className="text-[#D9DCD8]">·</span>
               <span className="font-code text-[11px] text-[#858C87]">47 services | 183 dependencies</span>
@@ -244,10 +269,10 @@ export const AppShell: React.FC<AppShellProps> = ({ currentPage, onNavigate, chi
             <button
               onClick={() => onNavigate('active-incidents')}
               className="flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] bg-[#B83A3A]/10 border border-[#B83A3A]/30 text-[#B83A3A] font-code text-[10px] font-semibold tracking-wide hover:bg-[#B83A3A]/20 transition-colors cursor-pointer"
-              title="Jump to Active Incident INC-8941"
+              title={isAuthFail ? "Jump to Active Incident INC-8945 (auth-gateway)" : "Jump to Active Incident INC-8941"}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-[#B83A3A] animate-pulse"></span>
-              <span>INC-8941 (CRITICAL)</span>
+              <span>{isAuthFail ? 'INC-8945 (CRITICAL) · auth-gateway' : 'INC-8941 (CRITICAL)'}</span>
             </button>
 
             {/* User Avatar */}

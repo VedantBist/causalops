@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MOCK_TRACE_SPANS } from '../data/mockData';
+import { useDemoState } from '../context/DemoStateContext';
 import { TraceSpan } from '../types';
 import { AppPage } from '../components/layout/AppShell';
 
@@ -8,14 +8,16 @@ interface TracesViewProps {
 }
 
 export const TracesView: React.FC<TracesViewProps> = ({ onNavigate }) => {
+  const { activeFault, traces: demoTraces } = useDemoState();
+  const isAuthFail = activeFault === 'auth-gateway';
   const [selectedSpanId, setSelectedSpanId] = useState<string>('span-db-1');
   const [filterService, setFilterService] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
-  const selectedSpan = MOCK_TRACE_SPANS.find((s) => s.id === selectedSpanId) || MOCK_TRACE_SPANS[4];
+  const selectedSpan = demoTraces.find((s) => s.id === selectedSpanId) || demoTraces[0];
   const totalDuration = 8420;
 
-  const filteredSpans = MOCK_TRACE_SPANS.filter((span) => {
+  const filteredSpans = demoTraces.filter((span) => {
     if (filterService !== 'all' && span.service !== filterService) return false;
     if (filterStatus === 'error' && span.status === 'OK') return false;
     if (filterStatus === 'ok' && span.status !== 'OK') return false;
@@ -31,10 +33,10 @@ export const TracesView: React.FC<TracesViewProps> = ({ onNavigate }) => {
             INCIDENT CORRELATED
           </span>
           <h1 className="text-sm font-bold text-slate-900 tracking-tight">
-            DISTRIBUTED TRACES · INC-8941 PROPAGATION PATH
+            DISTRIBUTED TRACES · {isAuthFail ? 'INC-8945' : 'INC-8941'} PROPAGATION PATH
           </h1>
           <span className="text-xs text-slate-500 font-mono">
-            {MOCK_TRACE_SPANS.length} Spans · Total Duration: 8,420ms
+            {demoTraces.length} Spans · Total Duration: 8,420ms
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -102,7 +104,8 @@ export const TracesView: React.FC<TracesViewProps> = ({ onNavigate }) => {
                   onChange={(e) => setFilterService(e.target.value)}
                   className="bg-white border border-slate-200 rounded px-2 py-1 text-xs font-mono text-slate-700 focus:outline-none focus:border-teal-500"
                 >
-                  <option value="all">All Services ({MOCK_TRACE_SPANS.length})</option>
+                  <option value="all">All Services ({demoTraces.length})</option>
+                  <option value="auth-gateway">auth-gateway</option>
                   <option value="api-gateway">api-gateway</option>
                   <option value="order-service">order-service</option>
                   <option value="inventory-service">inventory-service</option>
